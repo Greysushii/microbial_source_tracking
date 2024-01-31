@@ -6,6 +6,9 @@ import 'sample_feature/sample_item_details_view.dart';
 import 'sample_feature/sample_item_list_view.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
+import 'themes/glwa_theme.dart';
+import 'navbar/nav_bar.dart';
+import 'navbar/nav_model.dart';
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {
