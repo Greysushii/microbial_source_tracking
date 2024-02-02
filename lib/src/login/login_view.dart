@@ -16,15 +16,7 @@ class LoginView extends StatelessWidget {
                 children: [
                   Container(
                       alignment: Alignment.center,
-                      child: SvgPicture.asset('assets/images/glwa_logo.svg')
-                      /* Text(
-                      'Logo',
-                      style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 35,
-                          fontWeight: FontWeight.bold),
-                    ),*/
-                      ),
+                      child: SvgPicture.asset('assets/images/glwa_logo.svg')),
                   const SizedBox(height: 30),
                   Text(
                     'Login to your account',

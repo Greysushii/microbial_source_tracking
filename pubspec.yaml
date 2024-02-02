@@ -24,6 +24,12 @@ dev_dependencies:
 
   flutter_lints: ^2.0.0
 
+  flutter_native_splash: ^2.3.10
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/images/full_glwa_logo.png
+
 flutter:
   uses-material-design: true
 
