@@ -87,5 +87,5 @@ class _HistoryPageState extends State<HistoryPage> {
 
 Future<void> localImage(BuildContext context) async {
   final imageChoice = ImagePicker(); 
-  await imageChoice.pickImage(source: ImageSource.gallery);
+  await imageChoice.pickImage(source: ImageSource.gallery); // this allows access to local storage
 }
