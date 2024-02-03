@@ -92,6 +92,18 @@ class RegisterState extends State<RegisterAccount> {
                 obscureText: true,
               ),
             ),
+
+            //Finalize registration
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton(
+                      onPressed: () {}, child: const Text('Register')),
+                ],
+              ),
+            )
           ],
         ),
       ),
