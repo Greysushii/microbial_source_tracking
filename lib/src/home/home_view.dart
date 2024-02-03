@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:microbial_source_tracking/src/login/login_view.dart';
 
 class HomeListView extends StatelessWidget {
   HomeListView({super.key});
@@ -22,46 +23,56 @@ class HomeListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: const Text("Home Page")),
-        body: Column(
+        body: SafeArea(
+            child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text('Bluetooth Devices',
-                    style: TextStyle(fontWeight: FontWeight.bold))),
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 17))),
             Expanded(
-              child: ListView.separated(
+              child: ListView.builder(
                 padding: EdgeInsets.all(8.0),
                 itemCount: devices.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    height: 30,
-                    child: Text('Bluetooth ${devices[index]}'),
+                  return Card(
+                    child: ListTile(
+                      title: Text('Bluetooth ${devices[index]}'),
+                      onTap: () {
+                        const snackBar = SnackBar(
+                            content: Text('Bluetooth device is connected!'));
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      },
+                    ),
                   );
                 },
-                separatorBuilder: (BuildContext context, int index) =>
-                    const Divider(),
               ),
             ),
             const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text('Most Recent Pictures',
-                    style: TextStyle(fontWeight: FontWeight.bold))),
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 17))),
             Expanded(
-              child: ListView.separated(
+              child: ListView.builder(
                 padding: EdgeInsets.all(8.0),
                 itemCount: recents.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    height: 30,
-                    child: Text(recents[index]),
-                  );
+                  return Card(
+                      child: ListTile(
+                    title: Text(recents[index]),
+                    onTap: () {
+                      const snackBar =
+                          SnackBar(content: Text('Accessing image...'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    },
+                  ));
                 },
-                separatorBuilder: (BuildContext context, int index) =>
-                    const Divider(),
               ),
             ),
           ],
-        ));
+        )));
   }
 }
