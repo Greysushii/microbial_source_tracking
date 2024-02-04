@@ -26,24 +26,30 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
-  String selectedSection = '';
 
   PlatformFile? pickedFile;
+  List<String> selectedFileList = [];
 
   Future selectFile() async {
   final result = await FilePicker.platform.pickFiles();
   if (result == null) return;
   setState(() {
-  pickedFile = result.files.first;
-});
+    pickedFile = result.files.first;
+  });
 }
 
 Future uploadFile() async {
+  setState(() {
+    selectedFileList.add(pickedFile!.name);
+    pickedFile = null;
+  });
   final path = 'images/${pickedFile!.name}';
   final file = File(pickedFile!.path!);
 
   final ref = FirebaseStorage.instance.ref().child(path); 
   ref.putFile(file);
+
+  
 }
 
   @override
@@ -78,55 +84,74 @@ Future uploadFile() async {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const SizedBox(height: 15), 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (pickedFile != null)
-                Expanded(
-                  child: Container(
-                    color: Colors.blue[100],
-                    child: Center(
-                      child: Text(pickedFile!.name),
-                      ),
-                    ),
-                  ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    selectedSection = 'Uploaded'; // for highlighting whatever section the user is on (Uploaded History or Received History)
-                });
-                },
-                style: ElevatedButton.styleFrom(
-                  
-                ),
-                child: const Text('Uploaded'),
-              ),
-              const SizedBox(width: 15),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    selectedSection = 'Received'; // for highlighting whatever section the user is on (Uploaded History or Received History)
-                });
-                },
-                style: ElevatedButton.styleFrom(
-                ),
-                child: const Text('Received'),
-              ),
-            ],
-          ),
+//          const SizedBox(height: 15), 
+//          Row(
+//            mainAxisAlignment: MainAxisAlignment.center,
+//            children: [
+//              ElevatedButton(
+//                onPressed: () {
+//                  
+//                },
+//                style: ElevatedButton.styleFrom(
+//                  
+//                ),
+//                child: const Text('Uploaded'),
+//              ),
+//              const SizedBox(width: 15),
+//              ElevatedButton(
+//                onPressed: () {
+//                  
+//                },
+//                style: ElevatedButton.styleFrom(
+//                ),
+//               child: const Text('Received'),
+//              ),
+//            ],
+//          ),
           const SizedBox(height: 10),
-          Text(
-                selectedSection == 'Uploaded'
-                ? 'Area for upload history'
-                : selectedSection == 'Received'
-                ? 'Area for received history'
-                : 'Select history option.',
-            style: const TextStyle(fontSize: 20),
-          ),
+          if (selectedFileList.isNotEmpty)
+            Column(
+              children: [
+                Text('Uploaded Files:',
+                style: TextStyle(
+                  fontSize: 25, 
+                  fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Container(
+                  height: 500, // Adjust the height as needed
+                  child: ListView.builder(
+                    itemCount: selectedFileList.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        leading: Icon(Icons.cloud_upload),
+                        title: Text(selectedFileList[index]),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     );
   }
 }
   
+//if (pickedFile != null)
+  //              Expanded(
+    //              child: Container(
+      //              color: Colors.blue[100],
+        //            child: Center(
+          //            child: Text(pickedFile!.name),
+            //          ),
+              //      ),
+                //  ),
+                
+  //ListView(
+    //            for (var pair in appState.favorites)
+      //    ListTile(
+        //    leading: Icon(Icons.favorite), 
+          //  title: Text(pair.asLowerCase),
+         // )
+  //)
