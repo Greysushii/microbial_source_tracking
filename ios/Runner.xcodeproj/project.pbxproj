@@ -15,6 +15,7 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		A76910E03C0913401982AA51 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4553B98159AFD27C0D9D7953 /* Pods_Runner.framework */; };
 		AAC50C082B65C8620010BA31 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AAC50C072B65C8620010BA31 /* GoogleService-Info.plist */; };
 		ACC4D4E4A2383B366091E70F /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6212E77C3F049B089132472A /* Pods_RunnerTests.framework */; };
 /* End PBXBuildFile section */
@@ -109,6 +110,29 @@
 				331C807B294A618700263BE5 /* RunnerTests.swift */,
 			);
 			path = RunnerTests;
+			sourceTree = "<group>";
+		};
+		37F6766E44A86F2506DA31D2 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4553B98159AFD27C0D9D7953 /* Pods_Runner.framework */,
+				F4EF13536FFB8DB2B404B13D /* Pods_RunnerTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3AA72421491B1B774BC5C79B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				FF76CE58596ED78FCB1352AF /* Pods-Runner.debug.xcconfig */,
+				C42B34C87A338BA3C39F23F0 /* Pods-Runner.release.xcconfig */,
+				FED459E3312DCDF3340C4982 /* Pods-Runner.profile.xcconfig */,
+				4EC42A43965BE6173914910A /* Pods-RunnerTests.debug.xcconfig */,
+				58BE8C9B9AB3FE85FD6F74A8 /* Pods-RunnerTests.release.xcconfig */,
+				C2D7353A8A7F2102D37F8187 /* Pods-RunnerTests.profile.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 		9740EEB11CF90186004384FC /* Flutter */ = {
@@ -365,6 +389,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
+		};
+		FB7C10694604ED24A1D4D6CA /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-RunnerTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 

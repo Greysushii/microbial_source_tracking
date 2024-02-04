@@ -1,51 +1,78 @@
 import 'package:flutter/material.dart';
+import 'package:microbial_source_tracking/src/settings/settings_model.dart';
+import 'package:microbial_source_tracking/src/widgets/profile_card.dart';
+import 'package:microbial_source_tracking/src/widgets/settings_card.dart';
 
-import 'settings_controller.dart';
 
-/// Displays the various settings that can be customized by the user.
-///
-/// When a user changes a setting, the SettingsController is updated and
-/// Widgets that listen to the SettingsController are rebuilt.
-class SettingsView extends StatelessWidget {
-  const SettingsView({super.key, required this.controller});
 
-  static const routeName = '/settings';
 
-  final SettingsController controller;
+class SettingsView extends StatefulWidget {
+  const SettingsView({
+    super.key,
+    });
 
   @override
+  State<SettingsView> createState() => _SettingsViewState();
+}
+
+class _SettingsViewState extends State<SettingsView> {
+  @override
   Widget build(BuildContext context) {
+    // ignore: prefer_const_constructors
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
+      // ignore: prefer_const_constructors
       body: Padding(
-        padding: const EdgeInsets.all(16),
-        // Glue the SettingsController to the theme selection DropdownButton.
-        //
-        // When a user selects a theme from the dropdown list, the
-        // SettingsController is updated, which rebuilds the MaterialApp.
-        child: DropdownButton<ThemeMode>(
-          // Read the selected themeMode from the controller
-          value: controller.themeMode,
-          // Call the updateThemeMode method any time the user selects a theme.
-          onChanged: controller.updateThemeMode,
-          items: const [
-            DropdownMenuItem(
-              value: ThemeMode.system,
-              child: Text('System Theme'),
+        padding: const EdgeInsets.symmetric(
+          vertical: 25,
+          horizontal: 20,
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start ,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const ProfileCard(),
+                const SizedBox(height: 5),
+                const Divider(),
+                const SizedBox(height: 10),
+                Column(
+                  children: List.generate(
+                    settings.length, 
+                    (index) => SettingsCard(settings: settings[index]),
+                  ),
+                ),
+                const SizedBox(height: 5),
+                const Divider(),
+                const SizedBox(height: 10),
+                Column(
+                  children: List.generate(
+                    settings2.length, 
+                    (index) => SettingsCard(settings: settings2[index]),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  width: double.infinity,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.lightBlue.shade100,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ],
             ),
-            DropdownMenuItem(
-              value: ThemeMode.light,
-              child: Text('Light Theme'),
-            ),
-            DropdownMenuItem(
-              value: ThemeMode.dark,
-              child: Text('Dark Theme'),
-            )
-          ],
+          ),
         ),
       ),
     );
   }
 }
+
+
+
+
+
+
+
+

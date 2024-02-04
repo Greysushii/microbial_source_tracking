@@ -17,6 +17,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_svg: ^2.0.9
+  image_picker: ^1.0.7 # this enables accessing local storage 
+
 
 dev_dependencies:
   flutter_test:
