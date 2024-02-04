@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:microbial_source_tracking/src/home/home_view.dart';
 
 class LoginView extends StatelessWidget {
   LoginView({super.key});
@@ -34,13 +35,17 @@ class LoginView extends StatelessWidget {
                         fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    'Login button goes here',
-                    style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500),
-                  ),
+                  TextButton(
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStatePropertyAll(Colors.lightBlue)),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HomeListView()));
+                      },
+                      child: Text('Sign in'))
                 ],
               )),
         ),
