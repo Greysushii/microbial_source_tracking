@@ -1,8 +1,31 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 void main() {
   runApp(const MyApp());
+}
+
+//Main authentication code
+class Authentication {
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  //Email and password of the user in order to sign in
+  Future<User> userSignInDetails(String email, String password) async {
+    UserCredential result =
+        await auth.signInWithEmailAndPassword(email: email, password: password);
+    final User user = result.user!;
+
+    return user;
+  }
+
+  //Account creation
+  Future<User> userRegister(email, password) async {
+    UserCredential result = await auth.createUserWithEmailAndPassword(
+        email: email, password: password);
+    final User user = result.user!;
+
+    return user;
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -47,6 +70,15 @@ class RegisterAccount extends StatefulWidget {
 }
 
 class RegisterState extends State<RegisterAccount> {
+  //retrieve text from input
+  final myController = TextEditingController();
+  @override
+  void dispose() {
+    //clean up controller when widget is done using it.
+    myController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,7 +126,7 @@ class RegisterState extends State<RegisterAccount> {
               ),
             ),
 
-            //Finalize registration
+            //Finalize registration button
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Row(
