@@ -39,17 +39,19 @@ class _HistoryPageState extends State<HistoryPage> {
 }
 
 Future uploadFile() async {
+
   setState(() {
     selectedFileList.add(pickedFile!.name);
-    pickedFile = null;
+    pickedFile = null; // once prototype 1 is put together, comment this out and uncomment the one under 'ref.putFile(file)'
   });
+
   final path = 'images/${pickedFile!.name}';
   final file = File(pickedFile!.path!);
 
   final ref = FirebaseStorage.instance.ref().child(path); 
   ref.putFile(file);
+  // pickedFile = null;
 
-  
 }
 
   @override
@@ -70,7 +72,10 @@ Future uploadFile() async {
             ),
           ),
           TextButton(
-            onPressed: uploadFile,
+            onPressed: () { 
+              uploadFile();
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Successfully Uploaded!'),),);
+            },
             child: const Row(
               children: [
                 Icon(Icons.cloud_upload),
@@ -119,13 +124,15 @@ Future uploadFile() async {
                   ),
                 ),
                 Container(
-                  height: 500, // Adjust the height as needed
+                  height: MediaQuery.of(context).size.height, // MediaQuery adjusts container height to fit device
                   child: ListView.builder(
                     itemCount: selectedFileList.length,
                     itemBuilder: (context, index) {
-                      return ListTile(
+                      return Card(
+                        child: ListTile(
                         leading: Icon(Icons.cloud_upload),
                         title: Text(selectedFileList[index]),
+                        ),
                       );
                     },
                   ),
