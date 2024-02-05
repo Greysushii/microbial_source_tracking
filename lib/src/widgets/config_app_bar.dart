@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+// ignore: camel_case_types
 class configAppBar extends StatelessWidget {
   const configAppBar({
     super.key,
@@ -14,14 +15,14 @@ class configAppBar extends StatelessWidget {
         const Icon(
           Icons.devices_other_sharp, 
           color: Colors.black, 
-          size: 30,
+          size: 35,
           ),
         const SizedBox(width: 10,),
         const Text(
-          'Devices',
+          'Device Settings',
           style: TextStyle(
             color: Colors.black,
-            fontSize: 30,
+            fontSize: 25,
             fontWeight: FontWeight.bold,
           ),
         ),

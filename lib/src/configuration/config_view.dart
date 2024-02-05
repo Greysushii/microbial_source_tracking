@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
+//import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:microbial_source_tracking/src/widgets/bluetooth_List.dart';
 import 'package:microbial_source_tracking/src/widgets/config_app_bar.dart';
-
 
 class ConfigView extends StatefulWidget {
   const ConfigView({
     super.key,
     });
-
-  // List<BluetoothDevice> devices = await FlutterBluePlus.systemDevices;
-  // for (var d in devices) {
-  //   async await d.connect(); // Must connect *our* app to the device
-  //   async await d.discoverServices();
-  // }
 
   @override
   State<ConfigView> createState() => _ConfigViewState();
@@ -20,6 +15,8 @@ class ConfigView extends StatefulWidget {
 class _ConfigViewState extends State<ConfigView> {
   @override
   Widget build(BuildContext context) {
+    //final List<BluetoothDevice> devices =  FlutterBluePlus.connectedDevices; //Using BluePlus for pulling connectedDevice information
+    List<String> devices = <String>['Device 1', 'Device 2', 'Device 3', 'Device 4', 'Device 5'];
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -32,29 +29,7 @@ class _ConfigViewState extends State<ConfigView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const configAppBar(),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text('Bluetooth Devices',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 17))),
-            Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.all(8.0),
-                //itemCount: devices.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Card(
-                    child: ListTile(
-                      //title: Text('Bluetooth ${devices[index]}'),
-                      onTap: () {
-                        const snackBar = SnackBar(
-                            content: Text('Bluetooth device is connected!'));
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
+              bluetoothList(devices: devices),
             ],
           ),
         ),
@@ -62,4 +37,6 @@ class _ConfigViewState extends State<ConfigView> {
     );    
   }
 }
+
+
 
