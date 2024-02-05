@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:microbial_source_tracking/src/configuration/config_view.dart';
-import 'package:microbial_source_tracking/src/settings/settings_view.dart';
+//import 'package:microbial_source_tracking/src/settings/settings_view.dart';
 import 'package:microbial_source_tracking/src/themes/glwa_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';

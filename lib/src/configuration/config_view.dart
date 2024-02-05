@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:microbial_source_tracking/src/widgets/config_app_bar.dart';
+
 
 class ConfigView extends StatefulWidget {
   const ConfigView({
     super.key,
     });
+
+  // List<BluetoothDevice> devices = await FlutterBluePlus.systemDevices;
+  // for (var d in devices) {
+  //   async await d.connect(); // Must connect *our* app to the device
+  //   async await d.discoverServices();
+  // }
 
   @override
   State<ConfigView> createState() => _ConfigViewState();
@@ -13,51 +21,45 @@ class _ConfigViewState extends State<ConfigView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       body: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: 60,
-          horizontal: 20,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            const SizedBox(height: 10),
-            const Text(
-              'Devices',
-              style: TextStyle(
-                fontSize: 25,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Container(
-              width: double.infinity,
-              height: 150,
-              decoration: BoxDecoration(
-                color: Colors.lightBlue.shade100,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Raspberry Pi v0',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 25, 
+            vertical: 10,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const configAppBar(),
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text('Bluetooth Devices',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 17))),
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.all(8.0),
+                //itemCount: devices.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Card(
+                    child: ListTile(
+                      //title: Text('Bluetooth ${devices[index]}'),
+                      onTap: () {
+                        const snackBar = SnackBar(
+                            content: Text('Bluetooth device is connected!'));
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      },
                     ),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
-            const Spacer(),
-            
-          ],
+            ],
+          ),
         ),
       ),
     );    
   }
 }
+
