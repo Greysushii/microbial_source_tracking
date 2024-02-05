@@ -1,30 +1,61 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-void main() {
+import '../../firebase_options.dart';
+
+FirebaseAuth auth = FirebaseAuth.instance;
+
+//Save the user's email and password when entering
+TextEditingController userEmail = TextEditingController();
+TextEditingController userPass = TextEditingController();
+
+//Email in the main function only takes a string, so casting the text controller
+//as a string SHOULD allow the function to accept them...i hope?
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
+
+  //Initialize the authentication emulator (For testing purposes!)
+  await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+
+  FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    if (user == null) {
+      if (kDebugMode) {
+        print('User is currently signed out!');
+      }
+    } else {
+      if (kDebugMode) {
+        print('User is signed in!');
+      }
+    }
+  });
 }
 
-//Main authentication code
-class Authentication {
-  final FirebaseAuth auth = FirebaseAuth.instance;
-  //Email and password of the user in order to sign in
-  Future<User> userSignInDetails(String email, String password) async {
-    UserCredential result =
-        await auth.signInWithEmailAndPassword(email: email, password: password);
-    final User user = result.user!;
-
-    return user;
-  }
-
-  //Account creation
-  Future<User> userRegister(email, password) async {
-    UserCredential result = await auth.createUserWithEmailAndPassword(
-        email: email, password: password);
-    final User user = result.user!;
-
-    return user;
+Future<void> registerUser() async {
+  try {
+    final credential =
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: userEmail.text,
+      password: userPass.text,
+    );
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'weak-password') {
+      if (kDebugMode) {
+        print('The password provided is too weak.');
+      }
+    } else if (e.code == 'email-already-in-use') {
+      if (kDebugMode) {
+        print('The account already exists for that email.');
+      }
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print(e);
+    }
   }
 }
 
@@ -94,6 +125,7 @@ class RegisterState extends State<RegisterAccount> {
                 horizontal: 50,
               ),
               child: TextFormField(
+                controller: userEmail,
                 decoration: const InputDecoration(
                   labelText: 'Email *',
                 ),
@@ -106,6 +138,7 @@ class RegisterState extends State<RegisterAccount> {
                 horizontal: 50,
               ),
               child: TextFormField(
+                controller: userPass,
                 decoration: const InputDecoration(
                   labelText: 'Password *',
                 ),
@@ -133,7 +166,10 @@ class RegisterState extends State<RegisterAccount> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ElevatedButton(
-                      onPressed: () {}, child: const Text('Register')),
+                      onPressed: () {
+                        registerUser();
+                      },
+                      child: const Text('Register')),
                 ],
               ),
             )
