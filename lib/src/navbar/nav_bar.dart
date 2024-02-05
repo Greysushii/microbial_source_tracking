@@ -64,7 +64,7 @@ Widget navItem(IconData icon, bool selected, {Function()? onTap}) {
       onTap: onTap,
       child: Icon(
         icon,
-        color: selected ? Colors.white : Colors.white.withOpacity(8.4),
+        color: selected ? Colors.white : Colors.white.withOpacity(0.8),
       )
     )
   );

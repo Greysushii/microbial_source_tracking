@@ -53,3 +53,20 @@ final List<Setting> settings2 = [
   ),
 ];
 
+final List<Setting> settings3 = [
+  Setting(
+    title: 'FAQ', 
+    route: '/', 
+    icon: Icons.question_mark,
+  ),
+  Setting(
+    title: 'Contact Us', 
+    route: '/', 
+    icon: Icons.phone,
+  ),
+  Setting(
+    title: 'Help Us', 
+    route: '/', 
+    icon: Icons.handshake,
+  ),
+];
