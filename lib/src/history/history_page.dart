@@ -45,7 +45,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: selectedSection == 'Uploaded'
-                      ? Colors.green
+                      ? Colors.lightBlue.shade200
                       : null,
                 ),
                 child: const Text('Uploaded'),
@@ -57,7 +57,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: selectedSection == 'Received'
-                      ? Colors.green
+                      ? Colors.lightBlue.shade200
                       : null,
                 ),
                 child: const Text('Received'),
