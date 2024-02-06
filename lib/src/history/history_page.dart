@@ -87,7 +87,8 @@ class _HistoryPageState extends State<HistoryPage> {
                     const Text(
                       'Uploaded Files',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17,
                       ),
                     ),
                     Container(
