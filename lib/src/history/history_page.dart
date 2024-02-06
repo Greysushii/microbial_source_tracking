@@ -109,7 +109,7 @@ Future uploadFile() async {
                   ),
                 ),
                 Container(
-                  height: MediaQuery.of(context).size.height, // MediaQuery adjusts container height to fit device
+                  height: MediaQuery.of(context).size.height, // MediaQuery adjusts container height to fit whatever device is being used
                   child: ListView.builder(
                     itemCount: selectedFileList.length,
                     itemBuilder: (context, index) {
@@ -129,21 +129,3 @@ Future uploadFile() async {
     );
   }
 }
-  
-//if (pickedFile != null)
-  //              Expanded(
-    //              child: Container(
-      //              color: Colors.blue[100],
-        //            child: Center(
-          //            child: Text(pickedFile!.name),
-            //          ),
-              //      ),
-                //  ),
-                
-  //ListView(
-    //            for (var pair in appState.favorites)
-      //    ListTile(
-        //    leading: Icon(Icons.favorite), 
-          //  title: Text(pair.asLowerCase),
-         // )
-  //)
