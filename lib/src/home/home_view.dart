@@ -8,7 +8,6 @@ import 'package:microbial_source_tracking/src/navbar/nav_bar.dart';
 import 'package:microbial_source_tracking/src/navbar/nav_model.dart';
 import 'package:microbial_source_tracking/src/settings/settings_view.dart';
 
-
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -17,7 +16,6 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeListViewState extends State<HomeView> {
-
   //Navigation through global keys on the main pages
   final homeNavKey = GlobalKey<NavigatorState>();
   final configNavKey = GlobalKey<NavigatorState>();
@@ -33,19 +31,19 @@ class _HomeListViewState extends State<HomeView> {
     super.initState();
     items = [
       NavModel(
-        page: const HomeListView(), 
+        page: const HomeListView(),
         navBarKey: homeNavKey,
       ),
       NavModel(
-        page: const ConfigView(), 
+        page: const ConfigView(),
         navBarKey: configNavKey,
       ),
       NavModel(
-        page: const HistoryPage(), 
+        page: const HistoryPage(),
         navBarKey: historyNavKey,
       ),
       NavModel(
-        page: const SettingsView(), 
+        page: const SettingsView(),
         navBarKey: settingsNavKey,
       ),
     ];
@@ -113,7 +111,7 @@ class _HomeListViewState extends State<HomeView> {
       ),
     );
   }
-}  
+}
 
 class TabPage extends StatelessWidget {
   final int tab;
@@ -138,7 +136,7 @@ class TabPage extends StatelessWidget {
                     builder: (context) => Page(tab: tab),
                   ),
                 );
-              }, 
+              },
               child: const Text('Go to page'),
             ),
           ],
@@ -149,17 +147,16 @@ class TabPage extends StatelessWidget {
 }
 
 class Page extends StatelessWidget {
-  
   final int tab;
 
   const Page({super.key, required this.tab});
 
-  @override 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Page Tab $tab'),
-        ),
+      ),
       body: Center(
         child: Text('Tab $tab'),
       ),
