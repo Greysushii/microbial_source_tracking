@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:microbial_source_tracking/src/home/home_list_view.dart';
+import 'package:microbial_source_tracking/src/home/home_view.dart';
+import 'package:microbial_source_tracking/src/widgets/account_creation_view.dart';
 import 'package:microbial_source_tracking/src/widgets/login_controller.dart';
 
 class LoginView extends StatelessWidget {
@@ -53,7 +54,7 @@ class LoginView extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: ((context) => const HomeListView())));
+                              builder: ((context) => const HomeView())));
                     },
                     child: Container(
                       padding: const EdgeInsets.all(20),
@@ -81,7 +82,14 @@ class LoginView extends StatelessWidget {
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           const Text('Don\'t have an account? '),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const RegisterAccount(),
+                ),
+              );
+            },
             child: const Text(
               'Sign up here',
               style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),

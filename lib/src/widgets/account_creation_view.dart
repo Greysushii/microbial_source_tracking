@@ -105,8 +105,8 @@ class MyApp extends StatelessWidget {
 }*/
 
 class RegisterAccount extends StatefulWidget {
-  const RegisterAccount({super.key, required this.title});
-  final String title;
+  const RegisterAccount({super.key,});
+  //final String title;
 
   @override
   State<StatefulWidget> createState() => RegisterState();
@@ -140,12 +140,19 @@ class RegisterState extends State<RegisterAccount> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Register',
+          style: TextStyle(
+            fontSize: 25,
+          ),
+        ),
+      ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Text("Register", style: TextStyle(fontSize: 36)),
-
             //Enter in their email (required)
             Container(
               margin: const EdgeInsets.symmetric(
