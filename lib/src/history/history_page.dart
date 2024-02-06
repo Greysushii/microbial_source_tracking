@@ -1,5 +1,7 @@
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -9,7 +11,33 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
-  String selectedSection = ''; 
+
+  PlatformFile? pickedFile;
+  List<String> selectedFileList = [];
+
+  Future selectFile() async {
+  final result = await FilePicker.platform.pickFiles();
+  if (result == null) return;
+  setState(() {
+    pickedFile = result.files.first;
+  });
+}
+
+Future uploadFile() async {
+
+  setState(() {
+    selectedFileList.add(pickedFile!.name);
+    // pickedFile = null; // once prototype 1 is put together, comment this out and uncomment the one under 'ref.putFile(file)'
+  });
+
+  final path = 'images/${pickedFile!.name}';
+  final file = File(pickedFile!.path!);
+
+  final ref = FirebaseStorage.instance.ref().child(path); 
+  ref.putFile(file);
+  pickedFile = null;
+
+}
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +47,19 @@ class _HistoryPageState extends State<HistoryPage> {
         centerTitle: true, 
         actions: [
           TextButton(
-            onPressed: () {
-              localImage(context);
+            onPressed: selectFile,
+            child: const Row(
+              children: [
+                Icon(Icons.cloud_upload),
+                SizedBox(width: 9),
+                Text('Select File'),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: () { 
+              uploadFile();
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Successfully Uploaded!'),),);
             },
             child: const Row(
               children: [
@@ -35,57 +74,58 @@ class _HistoryPageState extends State<HistoryPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const SizedBox(height: 15), 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  onButtonPressed('Uploaded');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: selectedSection == 'Uploaded'
-                      ? Colors.green
-                      : null,
-                ),
-                child: const Text('Uploaded'),
-              ),
-              const SizedBox(width: 15),
-              ElevatedButton(
-                onPressed: () {
-                  onButtonPressed('Received');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: selectedSection == 'Received'
-                      ? Colors.green
-                      : null,
-                ),
-                child: const Text('Received'),
-              ),
-            ],
-          ),
+//          const SizedBox(height: 15), 
+//          Row(
+//            mainAxisAlignment: MainAxisAlignment.center,
+//            children: [
+//              ElevatedButton(
+//                onPressed: () {
+//                  
+//                },
+//                style: ElevatedButton.styleFrom(
+//                  
+//                ),
+//                child: const Text('Uploaded'),
+//              ),
+//              const SizedBox(width: 15),
+//              ElevatedButton(
+//                onPressed: () {
+//                  
+//                },
+//                style: ElevatedButton.styleFrom(
+//                ),
+//               child: const Text('Received'),
+//              ),
+//            ],
+//          ),
           const SizedBox(height: 10),
-          Text(
-                selectedSection == 'Uploaded'
-                ? 'Area for upload history'
-                : selectedSection == 'Received'
-                ? 'Area for received history'
-                : 'Select a history option',
-            style: const TextStyle(fontSize: 20),
-          ),
+          if (selectedFileList.isNotEmpty)
+            Column(
+              children: [
+                Text('Uploaded Files:',
+                style: TextStyle(
+                  fontSize: 25, 
+                  fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Container(
+                  height: MediaQuery.of(context).size.height, // MediaQuery adjusts container height to fit whatever device is being used
+                  child: ListView.builder(
+                    itemCount: selectedFileList.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        child: ListTile(
+                        leading: Icon(Icons.cloud_upload),
+                        title: Text(selectedFileList[index]),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     );
   }
-
-  void onButtonPressed(String buttonText) {
-    setState(() {
-      selectedSection = buttonText; // for highlighting whatever section the user is on (Uploaded History or Received History)
-    });
-  }
-}
-
-Future<void> localImage(BuildContext context) async {
-  final imageChoice = ImagePicker(); 
-  await imageChoice.pickImage(source: ImageSource.gallery); // this allows access to local storage
 }
