@@ -11,15 +11,17 @@ FirebaseAuth auth = FirebaseAuth.instance;
 TextEditingController userEmail = TextEditingController();
 TextEditingController userPass = TextEditingController();
 
-//Email in the main function only takes a string, so casting the text controller
-//as a string SHOULD allow the function to accept them...i hope?
+//PassCheckOne is for the first password box, two is for the "confirm"
+//Once confirmed, userPass will become the appropriate password
+TextEditingController userPassCheckOne = TextEditingController();
+TextEditingController userPassCheckTwo = TextEditingController();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
 
   //Initialize the authentication emulator (For testing purposes!)
+  // !!Commented out as this is in main.dart
   await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
 
   FirebaseAuth.instance.authStateChanges().listen((User? user) {
@@ -29,10 +31,16 @@ Future<void> main() async {
       }
     } else {
       if (kDebugMode) {
-        print('User is signed in!');
+        print("User is $user !");
       }
     }
   });
+} // End of Main
+
+//Clears the passwords after not matching
+void clearPassword() {
+  userPassCheckOne.clear();
+  userPassCheckTwo.clear();
 }
 
 Future<void> registerUser() async {
@@ -51,6 +59,10 @@ Future<void> registerUser() async {
       if (kDebugMode) {
         print('The account already exists for that email.');
       }
+    } else {
+      if (kDebugMode) {
+        print('Registration successful!');
+      }
     }
   } catch (e) {
     if (kDebugMode) {
@@ -58,12 +70,12 @@ Future<void> registerUser() async {
     }
   }
 }
-
+// This widget is the root of your application. COMMENT THIS OUT BEFORE PUSHING!
+/*
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
-  @override
+@override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
@@ -90,7 +102,7 @@ class MyApp extends StatelessWidget {
       home: const RegisterAccount(title: 'Registration'),
     );
   }
-}
+}*/
 
 class RegisterAccount extends StatefulWidget {
   const RegisterAccount({super.key, required this.title});
@@ -99,6 +111,21 @@ class RegisterAccount extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => RegisterState();
 }
+
+//Dialog box for passwords not matching
+AlertDialog passNotMatch = const AlertDialog(
+  title: Text("Registration error"),
+  content: Text("Passwords do not match."),
+);
+
+//Nick, remember to cut down on reusing showdialog and alertdialog, look into
+//condensing the code
+AlertDialog passRegistration = const AlertDialog(
+  title: Text("Success!"),
+  content: Text("An email will be sent to the given email address."),
+);
+
+//Below this line is alllllllllllll the visual stuff!
 
 class RegisterState extends State<RegisterAccount> {
   //retrieve text from input
@@ -132,30 +159,31 @@ class RegisterState extends State<RegisterAccount> {
               ),
             ),
 
-            //Initial password (required)
+//Initial password (required)
             Container(
               margin: const EdgeInsets.symmetric(
                 horizontal: 50,
               ),
               child: TextFormField(
-                controller: userPass,
+                controller: userPassCheckOne,
                 decoration: const InputDecoration(
                   labelText: 'Password *',
                 ),
-                obscureText: true,
+                //obscureText: true,
               ),
             ),
 
-            //Password confirmation, must be the same as above (required)
+//Password confirmation, must be the same as above (required)
             Container(
               margin: const EdgeInsets.symmetric(
                 horizontal: 50,
               ),
               child: TextFormField(
+                controller: userPassCheckTwo,
                 decoration: const InputDecoration(
                   labelText: 'Confirm password *',
                 ),
-                obscureText: true,
+                //obscureText: true,
               ),
             ),
 
@@ -167,7 +195,25 @@ class RegisterState extends State<RegisterAccount> {
                 children: [
                   ElevatedButton(
                       onPressed: () {
-                        registerUser();
+                        //Check if passwords match, if yes, move onto authentication
+                        if (userPassCheckOne.text == userPassCheckTwo.text) {
+                          userPass = userPassCheckOne;
+                          registerUser();
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return passRegistration;
+                              });
+
+                          //If passwords do NOT match, retry.
+                        } else {
+                          clearPassword();
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return passNotMatch;
+                              });
+                        }
                       },
                       child: const Text('Register')),
                 ],
