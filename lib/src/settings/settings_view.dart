@@ -20,14 +20,13 @@ class _SettingsViewState extends State<SettingsView> {
   Widget build(BuildContext context) {
     // ignore: prefer_const_constructors
     return Scaffold(
-      // ignore: prefer_const_constructors
+      //ignore: prefer_const_constructors
       body: Padding(
         padding: const EdgeInsets.symmetric(
-          vertical: 35,
           horizontal: 20,
         ),
-        child: Center(
-          child: SingleChildScrollView(
+        child: SingleChildScrollView(
+          child: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start ,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -42,29 +41,11 @@ class _SettingsViewState extends State<SettingsView> {
                     (index) => SettingsCard(settings: settings[index]),
                   ),
                 ),
-                const SizedBox(height: 5),
-                const Divider(),
-                const SizedBox(height: 10),
-                Column(
-                  children: List.generate(
-                    settings2.length, 
-                    (index) => SettingsCard(settings: settings2[index]),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  width: double.infinity,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: Colors.lightBlue.shade100,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
               ],
             ),
           ),
         ),
-      ),
+      )
     );
   }
 }

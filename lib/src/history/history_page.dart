@@ -43,8 +43,8 @@ Future uploadFile() async {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('History Page'),
-        centerTitle: true, 
+        title: const Text('History'),
+        centerTitle: false, 
         actions: [
           TextButton(
             onPressed: selectFile,
@@ -71,41 +71,19 @@ Future uploadFile() async {
           ),
         ],
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-//          const SizedBox(height: 15), 
-//          Row(
-//            mainAxisAlignment: MainAxisAlignment.center,
-//            children: [
-//              ElevatedButton(
-//                onPressed: () {
-//                  
-//                },
-//                style: ElevatedButton.styleFrom(
-//                  
-//                ),
-//                child: const Text('Uploaded'),
-//              ),
-//              const SizedBox(width: 15),
-//              ElevatedButton(
-//                onPressed: () {
-//                  
-//                },
-//                style: ElevatedButton.styleFrom(
-//                ),
-//               child: const Text('Received'),
-//              ),
-//            ],
-//          ),
-          const SizedBox(height: 10),
-          if (selectedFileList.isNotEmpty)
-            Column(
-              children: [
-                Text('Uploaded Files:',
-                style: TextStyle(
-                  fontSize: 25, 
-                  fontWeight: FontWeight.bold,
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+            const SizedBox(height: 10),
+            if (selectedFileList.isNotEmpty)
+              Column(
+                children: [
+                  const Text('Uploaded Files:',
+                  style: TextStyle(
+                    fontSize: 25, 
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 Container(
@@ -115,16 +93,18 @@ Future uploadFile() async {
                     itemBuilder: (context, index) {
                       return Card(
                         child: ListTile(
-                        leading: Icon(Icons.cloud_upload),
+                        leading: const Icon(Icons.cloud_upload),
                         title: Text(selectedFileList[index]),
-                        ),
-                      );
-                    },
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
-            ),
-        ],
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
