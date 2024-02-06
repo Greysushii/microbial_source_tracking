@@ -16,28 +16,42 @@ class _HistoryPageState extends State<HistoryPage> {
   List<String> selectedFileList = [];
 
   Future selectFile() async {
-  final result = await FilePicker.platform.pickFiles();
-  if (result == null) return;
-  setState(() {
-    pickedFile = result.files.first;
-  });
-}
+    final result = await FilePicker.platform.pickFiles();
+    if (result == null) return;
+      setState(() {
+        pickedFile = result.files.first;
+      });
+  }
 
-Future uploadFile() async {
+  Future uploadFile() async {
+    setState(() {
+      selectedFileList.add(pickedFile!.name);
+      // pickedFile = null; // once prototype 1 is put together, comment this out and uncomment the one under 'ref.putFile(file)'
+    });
 
-  setState(() {
-    selectedFileList.add(pickedFile!.name);
-    // pickedFile = null; // once prototype 1 is put together, comment this out and uncomment the one under 'ref.putFile(file)'
-  });
+    final path = 'images/${pickedFile!.name}';
+    final file = File(pickedFile!.path!);
 
-  final path = 'images/${pickedFile!.name}';
-  final file = File(pickedFile!.path!);
+    final ref = FirebaseStorage.instance.ref().child(path); 
+    ref.putFile(file);
+    pickedFile = null;
 
-  final ref = FirebaseStorage.instance.ref().child(path); 
-  ref.putFile(file);
-  pickedFile = null;
+  }
 
-}
+  Future showFile(String fileName) async {
+      
+    var response = await FirebaseStorage.instance.ref('images/$fileName').getDownloadURL();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Image.network(response),
+        );
+      },
+    );
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,30 +88,6 @@ Future uploadFile() async {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-//          const SizedBox(height: 15), 
-//          Row(
-//            mainAxisAlignment: MainAxisAlignment.center,
-//            children: [
-//              ElevatedButton(
-//                onPressed: () {
-//                  
-//                },
-//                style: ElevatedButton.styleFrom(
-//                  
-//                ),
-//                child: const Text('Uploaded'),
-//              ),
-//              const SizedBox(width: 15),
-//              ElevatedButton(
-//                onPressed: () {
-//                  
-//                },
-//                style: ElevatedButton.styleFrom(
-//                ),
-//               child: const Text('Received'),
-//              ),
-//            ],
-//          ),
           const SizedBox(height: 10),
           if (selectedFileList.isNotEmpty)
             Column(
@@ -117,6 +107,9 @@ Future uploadFile() async {
                         child: ListTile(
                         leading: Icon(Icons.cloud_upload),
                         title: Text(selectedFileList[index]),
+                        onTap: () {
+                          showFile(selectedFileList[index]);
+                        }
                         ),
                       );
                     },
