@@ -23,7 +23,7 @@ class _SettingsViewState extends State<SettingsView> {
       // ignore: prefer_const_constructors
       body: Padding(
         padding: const EdgeInsets.symmetric(
-          vertical: 25,
+          vertical: 35,
           horizontal: 20,
         ),
         child: Center(
@@ -33,7 +33,7 @@ class _SettingsViewState extends State<SettingsView> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const ProfileCard(),
-                const SizedBox(height: 5),
+                const SizedBox(height: 0.005),
                 const Divider(),
                 const SizedBox(height: 10),
                 Column(

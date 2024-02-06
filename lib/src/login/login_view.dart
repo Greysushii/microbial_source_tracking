@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:microbial_source_tracking/src/home/home_view.dart';
+import 'package:microbial_source_tracking/src/home/home_list_view.dart';
 import 'package:microbial_source_tracking/src/widgets/login_controller.dart';
 
 class LoginView extends StatelessWidget {
-  LoginView({super.key});
+  const LoginView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 233, 248, 255),
+      backgroundColor: const Color.fromARGB(255, 233, 248, 255),
       body: SingleChildScrollView(
         child: SafeArea(
           child: Container(
@@ -22,7 +22,7 @@ class LoginView extends StatelessWidget {
                       alignment: Alignment.center,
                       child: SvgPicture.asset('assets/images/glwa_logo.svg')),
                   const SizedBox(height: 50),
-                  Text(
+                  const Text(
                     'Log in to your account',
                     style: TextStyle(
                         color: Colors.black,
@@ -32,17 +32,17 @@ class LoginView extends StatelessWidget {
                   const SizedBox(height: 15),
 
                   // Login widget
-                  Login(),
+                  const Login(),
 
                   const SizedBox(height: 10),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 30),
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           InkWell(
                             onTap: () {},
-                            child: Text('Forgot password?',
+                            child: const Text('Forgot password?',
                                 style: TextStyle(color: Colors.black)),
                           )
                         ]),
@@ -53,15 +53,15 @@ class LoginView extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: ((context) => HomeListView())));
+                              builder: ((context) => const HomeListView())));
                     },
                     child: Container(
-                      padding: EdgeInsets.all(20),
-                      margin: EdgeInsets.symmetric(horizontal: 30),
+                      padding: const EdgeInsets.all(20),
+                      margin: const EdgeInsets.symmetric(horizontal: 30),
                       decoration: BoxDecoration(
                           color: const Color.fromARGB(255, 52, 52, 52),
                           borderRadius: BorderRadius.circular(8)),
-                      child: Center(
+                      child: const Center(
                           child: Text(
                         'Sign in',
                         style: TextStyle(
@@ -79,10 +79,10 @@ class LoginView extends StatelessWidget {
         height: 50,
         alignment: Alignment.topCenter,
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Text('Don\'t have an account? '),
+          const Text('Don\'t have an account? '),
           InkWell(
             onTap: () {},
-            child: Text(
+            child: const Text(
               'Sign up here',
               style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
             ),
