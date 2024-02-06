@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:microbial_source_tracking/src/home/home_list_view.dart';
+import 'package:microbial_source_tracking/src/home/home_view.dart';
 import 'package:microbial_source_tracking/src/widgets/login_controller.dart';
 
 class LoginView extends StatelessWidget {
@@ -53,7 +53,7 @@ class LoginView extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: ((context) => const HomeListView())));
+                              builder: ((context) => const HomeView())));
                     },
                     child: Container(
                       padding: const EdgeInsets.all(20),
