@@ -27,7 +27,7 @@ Future uploadFile() async {
 
   setState(() {
     selectedFileList.add(pickedFile!.name);
-    pickedFile = null; // once prototype 1 is put together, comment this out and uncomment the one under 'ref.putFile(file)'
+    // pickedFile = null; // once prototype 1 is put together, comment this out and uncomment the one under 'ref.putFile(file)'
   });
 
   final path = 'images/${pickedFile!.name}';
@@ -35,7 +35,7 @@ Future uploadFile() async {
 
   final ref = FirebaseStorage.instance.ref().child(path); 
   ref.putFile(file);
-  // pickedFile = null;
+  pickedFile = null;
 
 }
 
