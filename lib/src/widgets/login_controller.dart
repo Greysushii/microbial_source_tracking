@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
+
+=======
   const Login({super.key});
 
   @override
@@ -17,6 +19,7 @@ class _LoginState extends State<Login> {
           children: [
             Container(
               margin: const EdgeInsets.symmetric(
+
                 horizontal: 30,
               ),
               child: TextFormField(
@@ -34,6 +37,7 @@ class _LoginState extends State<Login> {
             const SizedBox(height: 10),
             Container(
               margin: const EdgeInsets.symmetric(
+
                 horizontal: 30,
               ),
               child: TextFormField(
