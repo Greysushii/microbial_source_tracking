@@ -90,17 +90,20 @@ class _HistoryPageState extends State<HistoryPage> {
                         fontSize: 20,
                       ),
                     ),
-                    ListView.builder(
-                      padding: const EdgeInsets.all(8.0),
-                      itemCount: selectedFileList.length,
-                      itemBuilder: (context, index) {
-                        return Card(
-                          child: ListTile(
-                            leading: const Icon(Icons.cloud_upload),
-                            title: Text(selectedFileList[index]),
-                          ),
-                        );
-                      },
+                    Container(
+                      height: MediaQuery.of(context).size.height,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(8.0),
+                        itemCount: selectedFileList.length,
+                        itemBuilder: (context, index) {
+                          return Card(
+                            child: ListTile(
+                              leading: const Icon(Icons.cloud_upload),
+                              title: Text(selectedFileList[index]),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
