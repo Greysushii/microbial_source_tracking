@@ -1,7 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-//import 'package:microbial_source_tracking/src/login/login_view.dart';
-import 'package:microbial_source_tracking/src/home/home_view.dart';
-//import 'package:microbial_source_tracking/src/settings/settings_view.dart';
+import 'package:microbial_source_tracking/src/login/login_view.dart';
 import 'package:microbial_source_tracking/src/themes/glwa_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -29,7 +28,7 @@ class _MyAppState extends State<MyApp> {
       title: 'Test',
       debugShowCheckedModeBanner: false,
       theme: glwaTheme,
-      home: const HomeView(), //Fill in the page you are working on here to test
+      home: const LoginView(), //Fill in the page you are working on here to test
     );
   }
 }
