@@ -1,7 +1,6 @@
-
 import 'package:flutter/material.dart';
 
-// ignore: camel_case_types 
+// ignore: camel_case_types
 class bluetoothList extends StatelessWidget {
   const bluetoothList({
     super.key,
@@ -15,23 +14,23 @@ class bluetoothList extends StatelessWidget {
     return Expanded(
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(
-          horizontal: 5,
+          // horizontal: 5,
           vertical: 18,
         ),
         itemCount: devices.length,
         itemBuilder: (BuildContext context, int index) {
           return Card(
-            color: Colors.grey.shade100,
+            // color: Colors.grey.shade100,
             child: ListTile(
               title: Text('Bluetooth ${devices[index]}'),
               onTap: () {
                 Navigator.push(
-                  context, 
+                  context,
                   MaterialPageRoute(
-                      builder: (context) => const NextPage(),
-                    ),
-                  );
-                },
+                    builder: (context) => const NextPage(),
+                  ),
+                );
+              },
             ),
           );
         },
@@ -40,19 +39,20 @@ class bluetoothList extends StatelessWidget {
   }
 }
 
-class NextPage extends StatelessWidget { 
-    
-  const NextPage({super.key}); 
-  
-  @override 
-  Widget build(BuildContext context) { 
+class NextPage extends StatelessWidget {
+  const NextPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
-      child: Scaffold( 
-        appBar: AppBar(title: const Text('Device Settings'),), 
-        body: const Center( 
-          child: Text('Test Settings'), 
-        ), 
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Device Settings'),
+        ),
+        body: const Center(
+          child: Text('Test Settings'),
+        ),
       ),
-    ); 
-  } 
+    );
+  }
 }
