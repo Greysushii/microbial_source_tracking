@@ -1,14 +1,14 @@
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class HomeListView extends StatefulWidget{
+class HomeListView extends StatefulWidget {
   const HomeListView({super.key});
 
   @override
   State<HomeListView> createState() => _HomeListViewState();
- }
+}
 
- class _HomeListViewState extends State<HomeListView>  {
-
+class _HomeListViewState extends State<HomeListView> {
   //Test information to show flow of data
   final List<String> devices = <String>['Device 1', 'Device 2', 'Device 3'];
   final List<String> recents = <String>[
@@ -25,11 +25,16 @@ class HomeListView extends StatefulWidget{
     '121323_upload.jpg',
   ];
 
+  // void signUserOut() {
+  //   FirebaseAuth.instance.signOut();
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text("Home Page")),
+        appBar: AppBar(
+          title: const Text("Home Page"),
+        ),
         body: SafeArea(
             child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -83,4 +88,3 @@ class HomeListView extends StatefulWidget{
         )));
   }
 }
-
