@@ -36,6 +36,20 @@ class _HistoryPageState extends State<HistoryPage> {
     pickedFile = null;
   }
 
+  Future showFile(String fileName) async {
+    var response =
+        await FirebaseStorage.instance.ref('images/$fileName').getDownloadURL();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Image.network(response),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,9 +113,11 @@ class _HistoryPageState extends State<HistoryPage> {
                         itemBuilder: (context, index) {
                           return Card(
                             child: ListTile(
-                              leading: const Icon(Icons.cloud_upload),
-                              title: Text(selectedFileList[index]),
-                            ),
+                                leading: const Icon(Icons.cloud_upload),
+                                title: Text(selectedFileList[index]),
+                                onTap: () {
+                                  showFile(selectedFileList[index]);
+                                }),
                           );
                         },
                       ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-//import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+// import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:microbial_source_tracking/src/widgets/bluetooth_List.dart';
-import 'package:microbial_source_tracking/src/widgets/config_app_bar.dart';
+// import 'package:microbial_source_tracking/src/widgets/config_app_bar.dart';
 
 class ConfigView extends StatefulWidget {
   const ConfigView({
