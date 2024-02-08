@@ -23,7 +23,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  @override // This widget is the root of our application
+  @override //This widget is the root of our application
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Test',
