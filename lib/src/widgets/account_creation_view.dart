@@ -16,27 +16,6 @@ TextEditingController userPass = TextEditingController();
 TextEditingController userPassCheckOne = TextEditingController();
 TextEditingController userPassCheckTwo = TextEditingController();
 
-/*Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  //Initialize the authentication emulator (For testing purposes!)
-  // !!Commented out as this is in main.dart
-  await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-
-  FirebaseAuth.instance.authStateChanges().listen((User? user) {
-    if (user == null) {
-      if (kDebugMode) {
-        print('User is currently signed out!');
-      }
-    } else {
-      if (kDebugMode) {
-        print("User is $user !");
-      }
-    }
-  });
-} // End of Main*/
-
 //Clears the passwords after not matching
 void clearPassword() {
   userPassCheckOne.clear();
@@ -59,58 +38,31 @@ Future<void> registerUser() async {
       if (kDebugMode) {
         print('The account already exists for that email.');
       }
-    } else {
+    } else if (e.code == 'invalid-email') {
+      if (kDebugMode) {
+        print('Email address is badly formatted.');
+      }
+    } /* else {
       if (kDebugMode) {
         print('Registration successful!');
       }
-    }
+    } */
   } catch (e) {
     if (kDebugMode) {
       print(e);
     }
   }
 }
-// This widget is the root of your application. COMMENT THIS OUT BEFORE PUSHING!
-/*
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
 
-@override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 97, 150, 237)),
-        useMaterial3: true,
-      ),
-      home: const RegisterAccount(title: 'Registration'),
-    );
-  }
-}*/
+//Email the user their verification code
+var constructEmail = ActionCodeSettings(
+  url: 'glwa-app.firebaseapp.com',
+  handleCodeInApp: true,
+  iOSBundleId: 'com.example.ios',
+  androidPackageName: 'com.example.android',
+);
 
-class RegisterAccount extends StatefulWidget {
-  const RegisterAccount({super.key,});
-  //final String title;
-
-  @override
-  State<StatefulWidget> createState() => RegisterState();
-}
+var emailAuth = userEmail;
 
 //Dialog box for passwords not matching
 AlertDialog passNotMatch = const AlertDialog(
@@ -125,7 +77,15 @@ AlertDialog passRegistration = const AlertDialog(
   content: Text("An email will be sent to the given email address."),
 );
 
-//Below this line is alllllllllllll the visual stuff!
+class RegisterAccount extends StatefulWidget {
+  const RegisterAccount({
+    super.key,
+  });
+  //final String title;
+
+  @override
+  State<StatefulWidget> createState() => RegisterState();
+}
 
 class RegisterState extends State<RegisterAccount> {
   //retrieve text from input
@@ -203,6 +163,7 @@ class RegisterState extends State<RegisterAccount> {
                   ElevatedButton(
                       onPressed: () {
                         //Check if passwords match, if yes, move onto authentication
+
                         if (userPassCheckOne.text == userPassCheckTwo.text) {
                           userPass = userPassCheckOne;
                           registerUser();
