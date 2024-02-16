@@ -71,6 +71,32 @@ class _HistoryPageState extends State<HistoryPage> {
             children: [
               const SizedBox(height: 10),
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SearchAnchor(
+                          builder: (BuildContext context, SearchController controller) {
+                        return SearchBar(
+                          controller: controller,
+                          padding: const MaterialStatePropertyAll<EdgeInsets>(
+                            EdgeInsets.symmetric(horizontal: 16.0)),
+                          onTap: () {
+                            controller.openView();
+                          },
+                          onChanged: (_) {
+                            controller.openView();
+                          },
+                          leading: const Icon(Icons.search),
+                          );
+                          }, suggestionsBuilder:
+                                (BuildContext context, SearchController controller) {
+                            return [];
+                        }),
+                  )],
+                    ),
+              
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   TextButton(
