@@ -1,9 +1,127 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../firebase_options.dart';
+class RegisterAccount extends StatelessWidget {
+  const RegisterAccount({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 233, 248, 255),
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 50),
+                  Container(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 50,
+                    ),
+
+                    //Enter in their email (required)
+                    child: TextFormField(
+                        controller: userEmail,
+                        decoration: const InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey)),
+                          fillColor: Colors.white,
+                          filled: true,
+                          hintText: "Enter Email...",
+                        ),
+                        //Hints telling user what is missing.
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (text) {
+                          if (text == null || text.isEmpty) {
+                            return "Please enter your email.";
+                          }
+                          if (!text.contains('@')) {
+                            return "Email address must contain an @.";
+                          }
+                          return null;
+                        }),
+                  ),
+
+                  //Initial password (required)
+                  const SizedBox(height: 20),
+                  Container(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 50,
+                    ),
+                    child: TextFormField(
+                      controller: userPassCheckOne,
+                      decoration: const InputDecoration(
+                        labelText: 'Enter password *',
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey)),
+                        fillColor: Colors.white,
+                        filled: true,
+                        hintText: "Enter password...",
+                      ),
+                      obscureText: true,
+                    ),
+                  ),
+
+                  //Password confirmation, must be the same as above (required)
+                  Container(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 50,
+                    ),
+                    child: TextFormField(
+                      controller: userPassCheckTwo,
+                      decoration: const InputDecoration(
+                        labelText: 'Confirm password *',
+                      ),
+                      //obscureText: true,
+                    ),
+                  ),
+
+                  //Registration button
+                  const SizedBox(height: 20),
+                  GestureDetector(
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            //Insert success message here
+
+                            return passRegistration;
+                          });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      margin: const EdgeInsets.symmetric(horizontal: 30),
+                      decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 52, 52, 52),
+                          borderRadius: BorderRadius.circular(8)),
+                      child: const Center(
+                          child: Text(
+                        'Register',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )),
+                    ),
+                  ),
+                ],
+              )),
+        ),
+      ),
+    );
+  }
+}
+
+//Functions!-------------------------------------------------------
 
 FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -76,120 +194,3 @@ AlertDialog passRegistration = const AlertDialog(
   title: Text("Success!"),
   content: Text("An email will be sent to the given email address."),
 );
-
-class RegisterAccount extends StatefulWidget {
-  const RegisterAccount({
-    super.key,
-  });
-  //final String title;
-
-  @override
-  State<StatefulWidget> createState() => RegisterState();
-}
-
-class RegisterState extends State<RegisterAccount> {
-  //retrieve text from input
-  final myController = TextEditingController();
-  @override
-  void dispose() {
-    //clean up controller when widget is done using it.
-    myController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Register',
-          style: TextStyle(
-            fontSize: 25,
-          ),
-        ),
-      ),
-      body: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            //Enter in their email (required)
-            Container(
-              margin: const EdgeInsets.symmetric(
-                horizontal: 50,
-              ),
-              child: TextFormField(
-                controller: userEmail,
-                decoration: const InputDecoration(
-                  labelText: 'Email *',
-                ),
-              ),
-            ),
-
-//Initial password (required)
-            Container(
-              margin: const EdgeInsets.symmetric(
-                horizontal: 50,
-              ),
-              child: TextFormField(
-                controller: userPassCheckOne,
-                decoration: const InputDecoration(
-                  labelText: 'Password *',
-                ),
-                //obscureText: true,
-              ),
-            ),
-
-//Password confirmation, must be the same as above (required)
-            Container(
-              margin: const EdgeInsets.symmetric(
-                horizontal: 50,
-              ),
-              child: TextFormField(
-                controller: userPassCheckTwo,
-                decoration: const InputDecoration(
-                  labelText: 'Confirm password *',
-                ),
-                //obscureText: true,
-              ),
-            ),
-
-            //Finalize registration button
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ElevatedButton(
-                      onPressed: () {
-                        //Check if passwords match, if yes, move onto authentication
-
-                        if (userPassCheckOne.text == userPassCheckTwo.text) {
-                          userPass = userPassCheckOne;
-                          registerUser();
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return passRegistration;
-                              });
-
-                          //If passwords do NOT match, retry.
-                        } else {
-                          clearPassword();
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return passNotMatch;
-                              });
-                        }
-                      },
-                      child: const Text('Register')),
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-}
