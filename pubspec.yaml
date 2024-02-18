@@ -11,7 +11,7 @@ environment:
 
 dependencies:
   firebase_auth: ^4.17.3
-  firebase_core: ^2.25.3
+  firebase_core: ^2.25.4
   flutter:
     sdk: flutter
   flutter_blue_plus: ^1.31.13
@@ -21,9 +21,11 @@ dependencies:
   image_picker: ^1.0.7 # this enables accessing local storage 
   file_picker: ^4.5.1 # this too but for files not just images 
   firebase_storage: 11.6.0
+  intl: ^0.18.0
 
 
   flutter_gen: any
+  cloud_firestore: ^4.15.4
 dev_dependencies:
   flutter_test:
     sdk: flutter
