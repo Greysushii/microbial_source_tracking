@@ -1,11 +1,25 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/widgets.dart';
 
-class RegisterAccount extends StatelessWidget {
+class RegisterAccount extends StatefulWidget {
   const RegisterAccount({
     super.key,
   });
+  @override
+  State<StatefulWidget> createState() => RegisterState();
+}
+
+class RegisterState extends State<RegisterAccount> {
+  //retrieve text from input
+  final myController = TextEditingController();
+  @override
+  void dispose() {
+    //clean up controller when widget is done using it.
+    myController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,91 +27,96 @@ class RegisterAccount extends StatelessWidget {
       backgroundColor: const Color.fromARGB(255, 233, 248, 255),
       body: SingleChildScrollView(
         child: SafeArea(
-          child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  const SizedBox(height: 50),
-                  Container(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 50,
-                    ),
+            child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(8.0),
+          child: Column(children: [
+            const SizedBox(height: 50),
+            Container(
+              margin: const EdgeInsets.symmetric(
+                horizontal: 50,
+              ),
 
-                    //Enter in their email (required)
-                    child: TextFormField(
-                        controller: userEmail,
-                        decoration: const InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white)),
-                          focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey)),
-                          fillColor: Colors.white,
-                          filled: true,
-                          hintText: "Enter Email...",
-                        ),
-                        //Hints telling user what is missing.
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        validator: (text) {
-                          if (text == null || text.isEmpty) {
-                            return "Please enter your email.";
-                          }
-                          if (!text.contains('@')) {
-                            return "Email address must contain an @.";
-                          }
-                          return null;
-                        }),
+              //Enter in their email (required)
+              child: TextFormField(
+                  controller: userEmail,
+                  decoration: const InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white)),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey)),
+                    fillColor: Colors.white,
+                    filled: true,
+                    hintText: "Enter Email...",
                   ),
+                  //Hints telling user what is missing.
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (text) {
+                    if (text == null || text.isEmpty) {
+                      return "Please enter your email.";
+                    }
+                    if (!text.contains('@')) {
+                      return "Email address must contain an @.";
+                    }
+                    return null;
+                  }),
+            ),
 
-                  //Initial password (required)
-                  const SizedBox(height: 20),
-                  Container(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 50,
-                    ),
-                    child: TextFormField(
-                      controller: userPassCheckOne,
-                      decoration: const InputDecoration(
-                        labelText: 'Enter password *',
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey)),
-                        fillColor: Colors.white,
-                        filled: true,
-                        hintText: "Enter password...",
-                      ),
-                      obscureText: true,
-                    ),
-                  ),
+            //Initial password (required)
+            const SizedBox(height: 20),
+            TextField(
+              controller: userPass,
+              decoration: const InputDecoration(
+                labelText: 'Password',
+              ),
+            ),
 
-                  //Password confirmation, must be the same as above (required)
-                  Container(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 50,
-                    ),
-                    child: TextFormField(
-                      controller: userPassCheckTwo,
-                      decoration: const InputDecoration(
-                        labelText: 'Confirm password *',
-                      ),
-                      //obscureText: true,
-                    ),
-                  ),
+            //Password confirmation, must be the same as above (required)
+            const SizedBox(height: 20),
+            Container(
+              margin: const EdgeInsets.symmetric(
+                horizontal: 50,
+              ),
+              child: TextFormField(
+                controller: userPassCheckTwo,
+                decoration: const InputDecoration(
+                  labelText: 'Confirm password *',
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey)),
+                  fillColor: Colors.white,
+                  filled: true,
+                  hintText: "Enter password...",
+                ),
+                obscureText: true,
+              ),
+            ),
 
-                  //Registration button
-                  const SizedBox(height: 20),
-                  GestureDetector(
-                    onTap: () {
-                      showDialog(
+            //Registration button
+            /*const SizedBox(height: 20),
+                  TextFormField(
+                    //validator: (value)
+                  )*/
+
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _validPass = validatePass(userPass.text);
+                });
+/*                       showDialog(
                           context: context,
                           builder: (BuildContext context) {
                             //Insert success message here
-
+                            registerUser();
                             return passRegistration;
-                          });
-                    },
-                    child: Container(
+                          }); */
+              },
+              child: Text('Validate Password'),
+            ),
+            _validPass ? Text('Valid') : Text('No.\n' '$_em'),
+/*                     child: Container(
                       padding: const EdgeInsets.all(20),
                       margin: const EdgeInsets.symmetric(horizontal: 30),
                       decoration: BoxDecoration(
@@ -111,11 +130,9 @@ class RegisterAccount extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       )),
-                    ),
-                  ),
-                ],
-              )),
-        ),
+                    ), */
+          ]),
+        )),
       ),
     );
   }
@@ -128,6 +145,8 @@ FirebaseAuth auth = FirebaseAuth.instance;
 //Save the user's email and password when entering
 TextEditingController userEmail = TextEditingController();
 TextEditingController userPass = TextEditingController();
+bool _validPass = false;
+String _em = '';
 
 //PassCheckOne is for the first password box, two is for the "confirm"
 //Once confirmed, userPass will become the appropriate password
@@ -138,6 +157,32 @@ TextEditingController userPassCheckTwo = TextEditingController();
 void clearPassword() {
   userPassCheckOne.clear();
   userPassCheckTwo.clear();
+}
+
+final Map<RegExp, String> _validators = {
+  RegExp(r'[A-Z]'): 'One uppercase',
+  RegExp(r'[!@#\\$%^&*(),.?":{}|<>]'): 'One special character',
+  RegExp(r'\\d'): 'One number',
+  RegExp(r'^.{8,25}$'): 'Between 8 and 25 characters',
+};
+
+bool validatePass(String userPass) {
+  //Reset error message
+  _em = '';
+  if (userPass.length < 8) {
+    _em += 'Minimum 8 characters.\n';
+  }
+  if (!userPass.contains(RegExp(r'[A-Z]'))) {
+    _em += '1 upper\n';
+  }
+  if (!userPass.contains(RegExp(r'[!@#\\$%^&*(),.?":{}|<>]'))) {
+    _em += '1 special character\n';
+  }
+  if (!userPass.contains(RegExp(r'\d'))) {
+    _em += '1 nunber\n';
+  }
+
+  return _em.isEmpty;
 }
 
 Future<void> registerUser() async {
