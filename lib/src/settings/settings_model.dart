@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:microbial_source_tracking/src/settings/account_data.dart';
 
 class Setting {
   final String title;
-  final String route;
+  final Widget route;
   final IconData icon;
 
   Setting({
@@ -15,22 +16,22 @@ class Setting {
 final List<Setting> settings = [
   Setting(
     title: 'Account Data',
-    route: '/',
+    route: AccountData(),
     icon: Icons.person_4,
   ),
   Setting(
     title: 'FAQ',
-    route: '/',
+    route: AccountData(),
     icon: Icons.question_mark,
   ),
   Setting(
     title: 'Contact Us',
-    route: '/',
+    route: AccountData(),
     icon: Icons.phone,
   ),
   Setting(
     title: 'Help Us',
-    route: '/',
+    route: AccountData(),
     icon: Icons.handshake,
   ),
   // Setting(
