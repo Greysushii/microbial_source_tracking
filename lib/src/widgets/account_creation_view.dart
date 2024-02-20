@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 
+//RegisterAccount is the name of this widget
 class RegisterAccount extends StatefulWidget {
   const RegisterAccount({
     super.key,
@@ -14,6 +15,7 @@ class RegisterAccount extends StatefulWidget {
 class RegisterState extends State<RegisterAccount> {
   //retrieve text from input
   final myController = TextEditingController();
+
   @override
   void dispose() {
     //clean up controller when widget is done using it.
@@ -41,6 +43,7 @@ class RegisterState extends State<RegisterAccount> {
               child: TextFormField(
                   controller: userEmail,
                   decoration: const InputDecoration(
+                    labelText: 'Email',
                     enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.white)),
                     focusedBorder: OutlineInputBorder(
@@ -64,13 +67,36 @@ class RegisterState extends State<RegisterAccount> {
 
             //Initial password (required)
             const SizedBox(height: 20),
-            TextField(
-              controller: userPass,
-              decoration: const InputDecoration(
-                labelText: 'Password',
+            Container(
+              margin: const EdgeInsets.symmetric(
+                horizontal: 50,
+              ),
+              child: TextFormField(
+                controller: userPass,
+                obscureText: passVisible,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  hintText: "Enter password...",
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                        passVisible ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () {
+                      setState(
+                        () {
+                          passVisible = !passVisible;
+                        },
+                      );
+                    },
+                  ),
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey)),
+                  fillColor: Colors.white,
+                  filled: true,
+                ),
               ),
             ),
-
             //Password confirmation, must be the same as above (required)
             const SizedBox(height: 20),
             Container(
@@ -79,17 +105,29 @@ class RegisterState extends State<RegisterAccount> {
               ),
               child: TextFormField(
                 controller: userPassCheckTwo,
-                decoration: const InputDecoration(
-                  labelText: 'Confirm password *',
-                  enabledBorder: OutlineInputBorder(
+                obscureText: confirmVisible,
+                decoration: InputDecoration(
+                  labelText: 'Confirm password',
+                  hintText: "Confirm password...",
+                  suffixIcon: IconButton(
+                    icon: Icon(confirmVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off),
+                    onPressed: () {
+                      setState(
+                        () {
+                          confirmVisible = !confirmVisible;
+                        },
+                      );
+                    },
+                  ),
+                  enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
-                  focusedBorder: OutlineInputBorder(
+                  focusedBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey)),
                   fillColor: Colors.white,
                   filled: true,
-                  hintText: "Enter password...",
                 ),
-                obscureText: true,
               ),
             ),
 
@@ -105,32 +143,12 @@ class RegisterState extends State<RegisterAccount> {
                 setState(() {
                   _validPass = validatePass(userPass.text);
                 });
-/*                       showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            //Insert success message here
-                            registerUser();
-                            return passRegistration;
-                          }); */
               },
-              child: Text('Validate Password'),
+              child: const Text('Validate Password'),
             ),
-            _validPass ? Text('Valid') : Text('No.\n' '$_em'),
-/*                     child: Container(
-                      padding: const EdgeInsets.all(20),
-                      margin: const EdgeInsets.symmetric(horizontal: 30),
-                      decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 52, 52, 52),
-                          borderRadius: BorderRadius.circular(8)),
-                      child: const Center(
-                          child: Text(
-                        'Register',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )),
-                    ), */
+            _validPass
+                ? const Text('Valid')
+                : Text('Invalid password.\nRequirements:\n' '$_em'),
           ]),
         )),
       ),
@@ -153,6 +171,10 @@ String _em = '';
 TextEditingController userPassCheckOne = TextEditingController();
 TextEditingController userPassCheckTwo = TextEditingController();
 
+//For showing/hiding the passwords
+bool passVisible = false;
+bool confirmVisible = false;
+
 //Clears the passwords after not matching
 void clearPassword() {
   userPassCheckOne.clear();
@@ -170,16 +192,22 @@ bool validatePass(String userPass) {
   //Reset error message
   _em = '';
   if (userPass.length < 8) {
-    _em += 'Minimum 8 characters.\n';
+    _em += '• Minimum 8 characters.\n';
+  }
+  if (userPass.length > 20) {
+    _em += '• Maximum 20 characters.\n';
   }
   if (!userPass.contains(RegExp(r'[A-Z]'))) {
-    _em += '1 upper\n';
+    _em += '• 1 uppercase.\n';
+  }
+  if (!userPass.contains(RegExp(r'[a-z]'))) {
+    _em += '• 1 lowercase.\n';
   }
   if (!userPass.contains(RegExp(r'[!@#\\$%^&*(),.?":{}|<>]'))) {
-    _em += '1 special character\n';
+    _em += '• 1 special character.\n';
   }
   if (!userPass.contains(RegExp(r'\d'))) {
-    _em += '1 nunber\n';
+    _em += '• 1 number.\n';
   }
 
   return _em.isEmpty;
