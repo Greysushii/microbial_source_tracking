@@ -11,6 +11,31 @@ class AccountData extends StatefulWidget {
 class _AccountDataState extends State<AccountData> {
   final user = FirebaseAuth.instance.currentUser!;
 
+  Future<void> editField(String field) async {
+    String newValue = "";
+    await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text('Edit $field'),
+              content: TextField(
+                autofocus: true,
+                decoration: InputDecoration(hintText: "Enter new $field"),
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text('Cancel')),
+                TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text('Save')),
+              ],
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)),
+            ));
+
+    // Firebase interaction goes here
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,68 +43,38 @@ class _AccountDataState extends State<AccountData> {
       body: SafeArea(
         child: ListView(
           children: [
-            // Text('My Details'),
             Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: EdgeInsets.only(left: 22),
               child: Text(
                 'My Details',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
             ),
             Container(
               decoration: BoxDecoration(
                   color: Color.fromARGB(255, 228, 228, 228),
                   borderRadius: BorderRadius.circular(8.0)),
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(16.0),
               margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Email'),
-                        Icon(Icons.settings, color: Colors.grey)
+                        Text(
+                          'Email',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        IconButton(
+                            onPressed: () => editField('Email'),
+                            icon: Icon(Icons.settings, color: Colors.grey))
                       ]),
-                  Text(user.email!)
-                ],
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 228, 228, 228),
-                  borderRadius: BorderRadius.circular(8.0)),
-              padding: const EdgeInsets.all(8.0),
-              margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Name'),
-                        Icon(Icons.settings, color: Colors.grey)
-                      ]),
-                  Text('Name goes here')
-                ],
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 228, 228, 228),
-                  borderRadius: BorderRadius.circular(8.0)),
-              padding: const EdgeInsets.all(8.0),
-              margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Password'),
-                        Icon(Icons.settings, color: Colors.grey)
-                      ]),
-                  Text('Change password here')
+                  Text(
+                    user.email!,
+                    style: TextStyle(fontSize: 16),
+                  )
                 ],
               ),
             ),
