@@ -16,10 +16,11 @@ class _AccountDataState extends State<AccountData> {
     await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text('Edit $field'),
+              title: Text('Change $field'),
               content: TextField(
                 autofocus: true,
-                decoration: InputDecoration(hintText: "Enter new $field"),
+                decoration: InputDecoration(
+                    hintText: "Enter new ${field.toLowerCase()}"),
               ),
               actions: [
                 TextButton(
@@ -75,6 +76,92 @@ class _AccountDataState extends State<AccountData> {
                     user.email!,
                     style: TextStyle(fontSize: 16),
                   )
+                ],
+              ),
+            ),
+
+            // edit first name
+            Container(
+              decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 228, 228, 228),
+                  borderRadius: BorderRadius.circular(8.0)),
+              padding: const EdgeInsets.all(16.0),
+              margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'First Name',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        IconButton(
+                            onPressed: () => editField('First Name'),
+                            icon: Icon(Icons.settings, color: Colors.grey))
+                      ]),
+                  Text(
+                    'First Name',
+                    style: TextStyle(fontSize: 16),
+                  )
+                ],
+              ),
+            ),
+
+            // edit last name
+            Container(
+              decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 228, 228, 228),
+                  borderRadius: BorderRadius.circular(8.0)),
+              padding: const EdgeInsets.all(16.0),
+              margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Last Name',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        IconButton(
+                            onPressed: () => editField('Last Name'),
+                            icon: Icon(Icons.settings, color: Colors.grey))
+                      ]),
+                  Text(
+                    'Last Name',
+                    style: TextStyle(fontSize: 16),
+                  )
+                ],
+              ),
+            ),
+
+            // edit password
+            Container(
+              decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 228, 228, 228),
+                  borderRadius: BorderRadius.circular(8.0)),
+              padding: const EdgeInsets.all(16.0),
+              margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Password',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        IconButton(
+                            onPressed: () => editField('Password'),
+                            icon: Icon(Icons.settings, color: Colors.grey))
+                      ]),
                 ],
               ),
             ),
