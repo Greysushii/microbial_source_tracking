@@ -55,11 +55,13 @@ Future<void> registerUser() async {
       password: userPass.text,
     );
 
-    FirebaseFirestore.instance.collection('users').add({
-      'first name': userFirstName.text.trim(),
-      'last name': userLastName.text.trim(),
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(credential.user!.email)
+        .set({
+      'firstname': userFirstName.text.trim(),
+      'lastname': userLastName.text.trim(),
       'email': userEmail.text.trim(),
-      // 'password' : userPass.text.trim(),
     });
   } on FirebaseAuthException catch (e) {
     if (e.code == 'weak-password') {

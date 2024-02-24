@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -40,133 +41,95 @@ class _AccountDataState extends State<AccountData> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Account Data')),
-      body: SafeArea(
-        child: ListView(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(left: 22),
-              child: Text(
-                'My Details',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 228, 228, 228),
-                  borderRadius: BorderRadius.circular(8.0)),
-              padding: const EdgeInsets.all(16.0),
-              margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Email',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                        IconButton(
-                            onPressed: () => editField('Email'),
-                            icon: Icon(Icons.settings, color: Colors.grey))
-                      ]),
-                  Text(
-                    user.email!,
-                    style: TextStyle(fontSize: 16),
-                  )
-                ],
-              ),
-            ),
+        appBar: AppBar(title: const Text('Account Data')),
+        body: StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.email)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final userData = snapshot.data!.data() as Map<String, dynamic>;
 
-            // edit first name
-            Container(
-              decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 228, 228, 228),
-                  borderRadius: BorderRadius.circular(8.0)),
-              padding: const EdgeInsets.all(16.0),
-              margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              return ListView(
                 children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'First Name',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                        IconButton(
-                            onPressed: () => editField('First Name'),
-                            icon: Icon(Icons.settings, color: Colors.grey))
-                      ]),
-                  Text(
-                    'First Name',
-                    style: TextStyle(fontSize: 16),
-                  )
-                ],
-              ),
-            ),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 22),
+                    child: Text(
+                      'My details',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ),
 
-            // edit last name
-            Container(
-              decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 228, 228, 228),
-                  borderRadius: BorderRadius.circular(8.0)),
-              padding: const EdgeInsets.all(16.0),
-              margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Last Name',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                        IconButton(
-                            onPressed: () => editField('Last Name'),
-                            icon: Icon(Icons.settings, color: Colors.grey))
-                      ]),
-                  Text(
-                    'Last Name',
-                    style: TextStyle(fontSize: 16),
-                  )
-                ],
-              ),
-            ),
+                  // user email
+                  buildAccountDataCard(
+                    title: 'Email',
+                    value: user.email ?? '',
+                    onEditPressed: () => editField('Email'),
+                  ),
 
-            // edit password
-            Container(
-              decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 228, 228, 228),
-                  borderRadius: BorderRadius.circular(8.0)),
-              padding: const EdgeInsets.all(16.0),
-              margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Password',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                        IconButton(
-                            onPressed: () => editField('Password'),
-                            icon: Icon(Icons.settings, color: Colors.grey))
-                      ]),
+                  // user first name
+                  buildAccountDataCard(
+                      title: 'First name',
+                      value: userData['firstname'] ?? '',
+                      onEditPressed: () => editField('First Name')),
+
+                  // user last name
+                  buildAccountDataCard(
+                      title: 'Last name',
+                      value: userData['lastname'] ?? '',
+                      onEditPressed: () => editField('Last Name')),
+
+                  // password
+                  buildAccountDataCard(
+                      title: 'Password',
+                      value: '********',
+                      onEditPressed: () => editField('Password')),
                 ],
-              ),
+              );
+            } else if (snapshot.data == null) {
+              return const Center(
+                child: Text('No data available'),
+              );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            }
+
+            return const Center(child: CircularProgressIndicator());
+          },
+        ));
+  }
+
+  Widget buildAccountDataCard(
+      {required String title,
+      required String value,
+      required VoidCallback onEditPressed}) {
+    return Container(
+      decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 228, 228, 228),
+          borderRadius: BorderRadius.circular(8.0)),
+      padding: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-          ],
-        ),
+            IconButton(
+                onPressed: onEditPressed,
+                icon: const Icon(Icons.settings, color: Colors.grey))
+          ]),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 16),
+          )
+        ],
       ),
     );
   }
