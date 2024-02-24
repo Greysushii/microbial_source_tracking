@@ -72,31 +72,54 @@ class RegisterState extends State<RegisterAccount> {
                 horizontal: 50,
               ),
               child: TextFormField(
-                controller: userPass,
-                obscureText: passVisible,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  hintText: "Enter password...",
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                        passVisible ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () {
-                      setState(
-                        () {
-                          passVisible = !passVisible;
-                        },
-                      );
-                    },
+                  controller: userPass,
+                  obscureText: passVisible,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    hintText: "Enter password...",
+                    suffixIcon: IconButton(
+                      icon: Icon(passVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off),
+                      onPressed: () {
+                        setState(
+                          () {
+                            //show the contents of "Enter password"
+                            passVisible = !passVisible;
+                          },
+                        );
+                      },
+                    ),
+                    enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white)),
+                    focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey)),
+                    fillColor: Colors.white,
+                    filled: true,
                   ),
-                  enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white)),
-                  focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  fillColor: Colors.white,
-                  filled: true,
-                ),
-              ),
+                  //Check for password strength and show what is missing.
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (text) {
+                    if (text == null || text.isEmpty) {
+                      return null;
+                    }
+                    if (strengthRequirements(text) == false) {
+                      if (kDebugMode) {
+                        print("Oh no");
+                      }
+                      passStrength = false;
+                      return _em;
+                    }
+                    if (strengthRequirements(text) == true) {
+                      if (kDebugMode) {
+                        print("Works yo");
+                      }
+                      passStrength = true;
+                    }
+                    return null;
+                  }),
             ),
+
             //Password confirmation, must be the same as above (required)
             const SizedBox(height: 20),
             Container(
@@ -104,11 +127,13 @@ class RegisterState extends State<RegisterAccount> {
                 horizontal: 50,
               ),
               child: TextFormField(
-                controller: userPassCheckTwo,
+                controller: userPassConfirm,
                 obscureText: confirmVisible,
                 decoration: InputDecoration(
                   labelText: 'Confirm password',
                   hintText: "Confirm password...",
+
+                  //Show/hide contents of "Confirm password"
                   suffixIcon: IconButton(
                     icon: Icon(confirmVisible
                         ? Icons.visibility
@@ -116,11 +141,13 @@ class RegisterState extends State<RegisterAccount> {
                     onPressed: () {
                       setState(
                         () {
+                          //Show the contents of "Confirm password"
                           confirmVisible = !confirmVisible;
                         },
                       );
                     },
                   ),
+
                   enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
                   focusedBorder: const OutlineInputBorder(
@@ -132,23 +159,28 @@ class RegisterState extends State<RegisterAccount> {
             ),
 
             //Registration button
-            /*const SizedBox(height: 20),
-                  TextFormField(
-                    //validator: (value)
-                  )*/
-
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 setState(() {
-                  _validPass = validatePass(userPass.text);
+                  if ((userPass.text == userPassConfirm.text) &&
+                      (userPass.text.isNotEmpty) &&
+                      (userPassConfirm.text.isNotEmpty)) {
+                    if (kDebugMode) {
+                      print("Equal");
+                    }
+                  }
+                  if (userPass.text != userPassConfirm.text) {
+                    const Text('incorrect');
+                    clearPassword();
+                    if (kDebugMode) {
+                      print("Baaad");
+                    }
+                  }
                 });
               },
               child: const Text('Validate Password'),
             ),
-            _validPass
-                ? const Text('Valid')
-                : Text('Invalid password.\nRequirements:\n' '$_em'),
           ]),
         )),
       ),
@@ -163,13 +195,20 @@ FirebaseAuth auth = FirebaseAuth.instance;
 //Save the user's email and password when entering
 TextEditingController userEmail = TextEditingController();
 TextEditingController userPass = TextEditingController();
-bool _validPass = false;
+
+bool passStrength =
+    false; //Initial password requirement check. default is false, true once the password field meets password strength requirement
+bool confirmStrength =
+    false; //Confirm password requirement check. default is false, true once the confirm password field meets password strength requirement
+bool bothStrength = false; //Once both passwords are equal, this becomes true
+
+//
 String _em = '';
 
 //PassCheckOne is for the first password box, two is for the "confirm"
 //Once confirmed, userPass will become the appropriate password
 TextEditingController userPassCheckOne = TextEditingController();
-TextEditingController userPassCheckTwo = TextEditingController();
+TextEditingController userPassConfirm = TextEditingController();
 
 //For showing/hiding the passwords
 bool passVisible = false;
@@ -177,8 +216,8 @@ bool confirmVisible = false;
 
 //Clears the passwords after not matching
 void clearPassword() {
-  userPassCheckOne.clear();
-  userPassCheckTwo.clear();
+  userPass.clear();
+  userPassConfirm.clear();
 }
 
 final Map<RegExp, String> _validators = {
@@ -188,9 +227,10 @@ final Map<RegExp, String> _validators = {
   RegExp(r'^.{8,25}$'): 'Between 8 and 25 characters',
 };
 
-bool validatePass(String userPass) {
+bool strengthRequirements(String userPass) {
   //Reset error message
   _em = '';
+  //Returns true if any of these values "fail"
   if (userPass.length < 8) {
     _em += '• Minimum 8 characters.\n';
   }
