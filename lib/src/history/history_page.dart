@@ -36,27 +36,28 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Future uploadFile() async {
-    
-    final image = <String, dynamic>{ // creates a test document with fields
-      "title": "This is an image",
-      "uploadedDate": FieldValue.serverTimestamp(),
+
+    final path = 'images/${pickedFile!.name}';
+    final file = File(pickedFile!.path!);
+    final ref = FirebaseStorage.instance.ref().child(path);
+    TaskSnapshot firebaseStorageUpload = await ref.putFile(file); // waiting for FB storage upload to complete before grabbing URL 
+
+    final image = <String, dynamic>{ // creates a test document with fields 
+      "title": "I love glwa",
+      "uploadedDate": FieldValue.serverTimestamp(), // grabs timestamp when doc was uploaded
+      "imageURL": await firebaseStorageUpload.ref.getDownloadURL()
     };
 
     db.collection("images").add(image).then((DocumentReference doc) => // adds that test doc created above to collection 
     print('DocumentSnapshot added with ID: ${doc.id}'));
 
-    // below: adds selected file from local storage to Firebase Storage (above is Cloud Firestore, below is Storage)
-    setState(() {
-      selectedFileList.add(pickedFile!.name);
-    });
-
-    final path = 'images/${pickedFile!.name}';
-    final file = File(pickedFile!.path!);
-
-    final ref = FirebaseStorage.instance.ref().child(path);
-    ref.putFile(file);
-
     pickedFile = null;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('File Uploaded!'),
+        ),
+      );
   }
 
   Future showFile(String fileName) async {
@@ -105,13 +106,15 @@ class _HistoryPageState extends State<HistoryPage> {
                     child: Row(
                       children: [
                         TextButton( 
+                          child: Text(
+                            'Filter By Date: ${DateFormat('MM-dd-yyyy').format(currentDate)}', // shows user the current selected date range with yyyy-mm-dd format
+                          ),
                           onPressed: () async {
-                            DateTime? pickedDate = await showDatePicker( // creates drop-down calendar for user to pick date
+                            DateTime? pickedDate = await showDatePicker( // From flutter material library: creates drop-down calendar for user to pick date
                               context: context,                              
-                              initialDate: currentDate, // user opens calendar, first sees currently set date (Today if filter date not set yet)
+                              initialDate: currentDate,   // user opens calendar, first sees currently set date (Today if filter date not set yet)
                               firstDate: DateTime(2000), // starting year for calendar
                               lastDate: DateTime.now(), // ending date (today's date)
-                              
                             );
                             if (pickedDate != null) {
                               setState(() {
@@ -119,9 +122,6 @@ class _HistoryPageState extends State<HistoryPage> {
                               });
                             }
                           },
-                          child: Text(
-                            'Selected Date: ${DateFormat('yyyy-MM-dd').format(currentDate)}', // shows user the current selected date range with yyyy-mm-dd format
-                          ),
                         ),
                         Icon(Icons.date_range),
                       ],
@@ -155,28 +155,23 @@ class _HistoryPageState extends State<HistoryPage> {
                       ],
                     ),
                   )],),
-              
-          StreamBuilder<QuerySnapshot>( 
+
+          StreamBuilder<QuerySnapshot>( // StreamBuilder listens to the Stream above
             stream: getDocumentStream(), // calls getDocumentStream() for filtered document display
             builder: (context, snapshot) {
-              List<QueryDocumentSnapshot> documents = snapshot.data?.docs ?? [];
+              List<QueryDocumentSnapshot> documents = snapshot.data?.docs ?? []; // puts the acquired filtered docs in list, avoiding null reference error by defaulting to an empty list
               if (documents.isEmpty) {
                 return Text('No documents found with current filters.'); // if no docs are present tells user
               }
 
               return Column(
               children:
-                documents.map((doc) { // 
-                var title = doc['title'];
-
-                DateTime uploadDate = doc['uploadedDate']?.toDate() ?? DateTime.now();
-                String formatDate = DateFormat('yyyy-MM-dd').format(uploadDate); // makes document display date on UI in more readable format than the default FieldValue.serverTimestamp() value
-
-                return ListTile(
-                  title: Text('$title'),
-                  subtitle: Text('$formatDate'),
+                documents.map((doc) { // map applies the function to all docs in the document List
+                String imageName = doc['title'];
+                return ListTile( 
+                  title: Text('$imageName')
                       );
-                    }).toList(), 
+                    }).toList(),
                   );
                 },
               ),
@@ -187,3 +182,4 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 }
+// search bar: search by date, location, and person who took the data. Nothing else is needed
