@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 
-//RegisterAccount is the name of this widget
+//RegisterAccount is the name of this widget, refer to RegisterAccount for routing purposes
 class RegisterAccount extends StatefulWidget {
   const RegisterAccount({
     super.key,
@@ -33,13 +33,54 @@ class RegisterState extends State<RegisterAccount> {
           width: double.infinity,
           padding: const EdgeInsets.all(8.0),
           child: Column(children: [
+            //Enter in their First Name (required)
             const SizedBox(height: 50),
             Container(
               margin: const EdgeInsets.symmetric(
                 horizontal: 50,
               ),
+              child: TextFormField(
+                controller: userFirstName,
+                decoration: const InputDecoration(
+                  labelText: 'First Name',
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey)),
+                  fillColor: Colors.white,
+                  filled: true,
+                  hintText: "First Name",
+                ),
+              ),
+            ),
 
-              //Enter in their email (required)
+            //Enter in their Last Name (required)
+            const SizedBox(height: 20),
+            Container(
+              margin: const EdgeInsets.symmetric(
+                horizontal: 50,
+              ),
+              child: TextFormField(
+                controller: userLastName,
+                decoration: const InputDecoration(
+                  labelText: 'Last Name',
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey)),
+                  fillColor: Colors.white,
+                  filled: true,
+                  hintText: "Last Name",
+                ),
+              ),
+            ),
+
+            //Enter in their email (required)
+            const SizedBox(height: 20),
+            Container(
+              margin: const EdgeInsets.symmetric(
+                horizontal: 50,
+              ),
               child: TextFormField(
                   controller: userEmail,
                   decoration: const InputDecoration(
@@ -50,7 +91,7 @@ class RegisterState extends State<RegisterAccount> {
                         borderSide: BorderSide(color: Colors.grey)),
                     fillColor: Colors.white,
                     filled: true,
-                    hintText: "Enter Email...",
+                    hintText: "Enter Email",
                   ),
                   //Hints telling user what is missing.
                   autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -76,7 +117,7 @@ class RegisterState extends State<RegisterAccount> {
                   obscureText: passVisible,
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    hintText: "Enter password...",
+                    hintText: "Enter password",
                     suffixIcon: IconButton(
                       icon: Icon(passVisible
                           ? Icons.visibility_off
@@ -84,7 +125,7 @@ class RegisterState extends State<RegisterAccount> {
                       onPressed: () {
                         setState(
                           () {
-                            //show the contents of "Enter password"
+                            //Toggle to show the contents of "Enter password"
                             passVisible = !passVisible;
                           },
                         );
@@ -131,7 +172,7 @@ class RegisterState extends State<RegisterAccount> {
                   obscureText: confirmVisible,
                   decoration: InputDecoration(
                     labelText: 'Confirm password',
-                    hintText: "Confirm password...",
+                    hintText: "Confirm password",
 
                     //Show/hide contents of "Confirm password"
                     suffixIcon: IconButton(
@@ -141,7 +182,7 @@ class RegisterState extends State<RegisterAccount> {
                       onPressed: () {
                         setState(
                           () {
-                            //Show the contents of "Confirm password"
+                            //Toggle to show the contents of "Confirm password"
                             confirmVisible = !confirmVisible;
                           },
                         );
@@ -186,6 +227,7 @@ class RegisterState extends State<RegisterAccount> {
                     print("Strength $passStrength \nConfirm $passConfirm \n\n");
                   }
                   if (((passStrength & passConfirm) == true)) {
+                    registerUser();
                     if (kDebugMode) {
                       print("\t\tEqual!");
                     }
@@ -199,7 +241,7 @@ class RegisterState extends State<RegisterAccount> {
                   }
                 });
               },
-              child: const Text('Validate Password'),
+              child: const Text('Sign Up', style: TextStyle(fontSize: 20)),
             ),
           ]),
         )),
@@ -214,6 +256,8 @@ FirebaseAuth auth = FirebaseAuth.instance;
 
 //Save the user's email and password when entering
 TextEditingController userEmail = TextEditingController();
+TextEditingController userFirstName = TextEditingController();
+TextEditingController userLastName = TextEditingController();
 TextEditingController userPass = TextEditingController();
 
 bool passStrength =
@@ -221,7 +265,8 @@ bool passStrength =
 //true once the password field meets password strength requirement
 bool passConfirm = false; //Once both passwords are equal, this becomes true
 
-//
+//Error message that appears when creating a password, holds all the requirements
+//that slowly are removed as the strength requirements are met.
 String _em = '';
 
 //PassCheckOne is for the first password box, two is for the "confirm"
