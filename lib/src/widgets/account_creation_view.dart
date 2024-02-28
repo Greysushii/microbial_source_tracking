@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/widgets.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 //RegisterAccount is the name of this widget, refer to RegisterAccount for routing purposes
 class RegisterAccount extends StatefulWidget {
@@ -312,19 +313,27 @@ bool strengthRequirements(String userPass) {
 
 Future<void> registerUser() async {
   try {
-    final credential =
+    UserCredential credential =
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: userEmail.text,
       password: userPass.text,
     );
+    //Create a key for the new user
+    FirebaseFirestore.instance.collection('users').add({
+      'first name': userFirstName.text.trim(),
+      'last name': userLastName.text.trim(),
+      'email': userEmail.text.trim(),
+      // 'password' : userPass.text.trim(),
+    });
   } on FirebaseAuthException catch (e) {
     if (e.code == 'weak-password') {
       if (kDebugMode) {
         print('The password provided is too weak.');
       }
     } else if (e.code == 'email-already-in-use') {
+      registerAlert(1);
       if (kDebugMode) {
-        print('The account already exists for that email.');
+        print('Alert 1: The account already exists for that email.');
       }
     } else if (e.code == 'invalid-email') {
       if (kDebugMode) {
@@ -360,7 +369,24 @@ AlertDialog passNotMatch = const AlertDialog(
 
 //Nick, remember to cut down on reusing showdialog and alertdialog, look into
 //condensing the code
-AlertDialog passRegistration = const AlertDialog(
-  title: Text("Success!"),
-  content: Text("An email will be sent to the given email address."),
-);
+
+Future registerAlert(int issueNumber) async {
+  //int issueNumber = 0;
+  String issueTitle = " ";
+  String issueContent = " ";
+  switch (issueNumber) {
+    case 0: //Default error
+      issueTitle = "Default title";
+      issueContent = "Default content";
+      break;
+    case 1: //Email already exists
+      issueTitle = "Email is already in use";
+      issueContent =
+          "If you have forgotten your password, you can recover your account";
+      break;
+  }
+  AlertDialog(
+    title: Text(issueTitle),
+    content: Text(issueContent),
+  );
+}
