@@ -220,29 +220,39 @@ class RegisterState extends State<RegisterAccount> {
 
             //Registration button
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  //Check if the values are the same, and if the boxes are not empty
-                  if (kDebugMode) {
-                    print("Strength $passStrength \nConfirm $passConfirm \n\n");
-                  }
-                  if (((passStrength & passConfirm) == true)) {
-                    registerUser();
+            Container(
+              margin: const EdgeInsets.symmetric(
+                horizontal: 50,
+              ),
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    //Check if the values are the same, and if the boxes are not empty
                     if (kDebugMode) {
-                      print("\t\tEqual!");
+                      print("Strength $passStrength \nConfirm $passConfirm \n");
                     }
-                  }
-                  if (((passStrength | passConfirm) == false)) {
-                    //const Text('incorrect');
-                    //clearPassword();
-                    if (kDebugMode) {
-                      print("\t\tINVALID ALL AROUND");
+                    if (((passStrength & passConfirm) == true)) {
+                      registerUser();
+                      if (kDebugMode) {
+                        print("\t\tEqual!");
+                      }
                     }
-                  }
-                });
-              },
-              child: const Text('Sign Up', style: TextStyle(fontSize: 20)),
+                    if (((passStrength | passConfirm) == false)) {
+                      //const Text('incorrect');
+                      //clearPassword();
+                      if (kDebugMode) {
+                        print("\t\tINVALID ALL AROUND");
+                      }
+                    }
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return passNotMatch;
+                        });
+                  });
+                },
+                child: const Text('Sign Up', style: TextStyle(fontSize: 20)),
+              ),
             ),
           ]),
         )),
@@ -331,7 +341,7 @@ Future<void> registerUser() async {
         print('The password provided is too weak.');
       }
     } else if (e.code == 'email-already-in-use') {
-      registerAlert(1);
+      //registerAlert(1);
       if (kDebugMode) {
         print('Alert 1: The account already exists for that email.');
       }
@@ -370,23 +380,5 @@ AlertDialog passNotMatch = const AlertDialog(
 //Nick, remember to cut down on reusing showdialog and alertdialog, look into
 //condensing the code
 
-Future registerAlert(int issueNumber) async {
-  //int issueNumber = 0;
-  String issueTitle = " ";
-  String issueContent = " ";
-  switch (issueNumber) {
-    case 0: //Default error
-      issueTitle = "Default title";
-      issueContent = "Default content";
-      break;
-    case 1: //Email already exists
-      issueTitle = "Email is already in use";
-      issueContent =
-          "If you have forgotten your password, you can recover your account";
-      break;
-  }
-  AlertDialog(
-    title: Text(issueTitle),
-    content: Text(issueContent),
-  );
-}
+
+
