@@ -1,10 +1,13 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
-//RegisterAccount is the name of this widget, refer to RegisterAccount for routing purposes
+//RegisterAccount is the name of this widget,
+//refer to RegisterAccount for routing purposes
 class RegisterAccount extends StatefulWidget {
   const RegisterAccount({
     super.key,
@@ -24,6 +27,43 @@ class RegisterState extends State<RegisterAccount> {
     super.dispose();
   }
 
+  Future<void> alertMessage(int issue) async {
+    String issueTitle = " ";
+    String issueContent = " ";
+    switch (issue) {
+      case 0:
+        issueTitle = "Default error";
+        issueContent = "This is the default error.";
+        break;
+      case 1:
+        issueTitle = "Success";
+        issueContent = "Welcome to our app!";
+        break;
+      case 2:
+        issueTitle = "Error";
+        issueContent = "Passwords do not match.";
+        break;
+    }
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(issueTitle, style: TextStyle(fontSize: 25)),
+          content: Text(issueContent, style: TextStyle(fontSize: 16)),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Approve'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,7 +74,7 @@ class RegisterState extends State<RegisterAccount> {
           width: double.infinity,
           padding: const EdgeInsets.all(8.0),
           child: Column(children: [
-            //Enter in their First Name (required)
+            //Enter in their First Name (required)------------------------------
             const SizedBox(height: 50),
             Container(
               margin: const EdgeInsets.symmetric(
@@ -55,7 +95,7 @@ class RegisterState extends State<RegisterAccount> {
               ),
             ),
 
-            //Enter in their Last Name (required)
+            //Enter in their Last Name (required)-------------------------------
             const SizedBox(height: 20),
             Container(
               margin: const EdgeInsets.symmetric(
@@ -76,7 +116,7 @@ class RegisterState extends State<RegisterAccount> {
               ),
             ),
 
-            //Enter in their email (required)
+            //Enter in their email (required)-----------------------------------
             const SizedBox(height: 20),
             Container(
               margin: const EdgeInsets.symmetric(
@@ -107,7 +147,7 @@ class RegisterState extends State<RegisterAccount> {
                   }),
             ),
 
-            //Initial password (required)
+            //Initial password (required)---------------------------------------
             const SizedBox(height: 20),
             Container(
               margin: const EdgeInsets.symmetric(
@@ -162,7 +202,7 @@ class RegisterState extends State<RegisterAccount> {
                   }),
             ),
 
-            //Password confirmation, must be the same as above (required)
+            //Password confirmation, must be the same as above (required)-------
             const SizedBox(height: 20),
             Container(
               margin: const EdgeInsets.symmetric(
@@ -218,7 +258,7 @@ class RegisterState extends State<RegisterAccount> {
                   }),
             ),
 
-            //Registration button
+            //Registration button-----------------------------------------------
             const SizedBox(height: 20),
             Container(
               margin: const EdgeInsets.symmetric(
@@ -231,24 +271,22 @@ class RegisterState extends State<RegisterAccount> {
                     if (kDebugMode) {
                       print("Strength $passStrength \nConfirm $passConfirm \n");
                     }
+
                     if (((passStrength & passConfirm) == true)) {
                       registerUser();
+                      alertMessage(1);
                       if (kDebugMode) {
                         print("\t\tEqual!");
                       }
                     }
                     if (((passStrength | passConfirm) == false)) {
-                      //const Text('incorrect');
-                      //clearPassword();
+                      alertMessage(2);
+                      clearPassword();
+
                       if (kDebugMode) {
                         print("\t\tINVALID ALL AROUND");
                       }
                     }
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return passNotMatch;
-                        });
                   });
                 },
                 child: const Text('Sign Up', style: TextStyle(fontSize: 20)),
@@ -261,7 +299,7 @@ class RegisterState extends State<RegisterAccount> {
   }
 }
 
-//Functions!-------------------------------------------------------
+//Functions!--------------------------------------------------------------------
 
 FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -270,11 +308,26 @@ TextEditingController userEmail = TextEditingController();
 TextEditingController userFirstName = TextEditingController();
 TextEditingController userLastName = TextEditingController();
 TextEditingController userPass = TextEditingController();
+TextEditingController userPassConfirm = TextEditingController();
 
 bool passStrength =
     false; //Initial password requirement check. default is false,
 //true once the password field meets password strength requirement
 bool passConfirm = false; //Once both passwords are equal, this becomes true
+
+//Hide the sign up button until all fields are filled
+
+bool checkButton() {
+  if ((userEmail.text.isEmpty |
+      userFirstName.text.isEmpty |
+      userLastName.text.isEmpty |
+      userPass.text.isEmpty |
+      userPassConfirm.text.isEmpty)) {
+    return false;
+  } else {
+    return true;
+  }
+}
 
 //Error message that appears when creating a password, holds all the requirements
 //that slowly are removed as the strength requirements are met.
@@ -282,8 +335,6 @@ String _em = '';
 
 //PassCheckOne is for the first password box, two is for the "confirm"
 //Once confirmed, userPass will become the appropriate password
-TextEditingController userPassCheckOne = TextEditingController();
-TextEditingController userPassConfirm = TextEditingController();
 
 //For showing/hiding the passwords
 bool passVisible = true;
@@ -328,19 +379,14 @@ Future<void> registerUser() async {
       email: userEmail.text,
       password: userPass.text,
     );
-    //Create a key for the new user
+    //Add the user into the user collections in Firebase
     FirebaseFirestore.instance.collection('users').add({
       'first name': userFirstName.text.trim(),
       'last name': userLastName.text.trim(),
       'email': userEmail.text.trim(),
-      // 'password' : userPass.text.trim(),
     });
   } on FirebaseAuthException catch (e) {
-    if (e.code == 'weak-password') {
-      if (kDebugMode) {
-        print('The password provided is too weak.');
-      }
-    } else if (e.code == 'email-already-in-use') {
+    if (e.code == 'email-already-in-use') {
       //registerAlert(1);
       if (kDebugMode) {
         print('Alert 1: The account already exists for that email.');
@@ -377,8 +423,8 @@ AlertDialog passNotMatch = const AlertDialog(
   content: Text("Passwords do not match."),
 );
 
-//Nick, remember to cut down on reusing showdialog and alertdialog, look into
-//condensing the code
-
-
-
+/* //Dialog box for passwords not matching
+AlertDialog passNotMatch = const AlertDialog(
+  title: Text("Registration error"),
+  content: Text("Passwords do not match."),
+); */
