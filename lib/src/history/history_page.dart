@@ -43,7 +43,7 @@ class _HistoryPageState extends State<HistoryPage> {
     TaskSnapshot firebaseStorageUpload = await ref.putFile(file); // waiting for FB storage upload to complete before grabbing URL 
 
     final image = <String, dynamic>{ // creates a test document with fields 
-      "title": "I love glwa",
+      "title": "Image 4",
       "uploadedDate": FieldValue.serverTimestamp(), // grabs timestamp when doc was uploaded
       "imageURL": await firebaseStorageUpload.ref.getDownloadURL()
     };
@@ -107,7 +107,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       children: [
                         TextButton( 
                           child: Text(
-                            'Filter By Date: ${DateFormat('MM-dd-yyyy').format(currentDate)}', // shows user the current selected date range with yyyy-mm-dd format
+                            'Upload Date: ${DateFormat('MM-dd-yyyy').format(currentDate)}', // shows user the current selected date range with yyyy-mm-dd format
                           ),
                           onPressed: () async {
                             DateTime? pickedDate = await showDatePicker( // From flutter material library: creates drop-down calendar for user to pick date
@@ -156,26 +156,64 @@ class _HistoryPageState extends State<HistoryPage> {
                     ),
                   )],),
 
-          StreamBuilder<QuerySnapshot>( // StreamBuilder listens to the Stream above
-            stream: getDocumentStream(), // calls getDocumentStream() for filtered document display
-            builder: (context, snapshot) {
-              List<QueryDocumentSnapshot> documents = snapshot.data?.docs ?? []; // puts the acquired filtered docs in list, avoiding null reference error by defaulting to an empty list
-              if (documents.isEmpty) {
-                return Text('No documents found with current filters.'); // if no docs are present tells user
-              }
+              StreamBuilder<QuerySnapshot>(
+                stream: getDocumentStream(),
+                builder: (context, snapshot) {
+                  List<QueryDocumentSnapshot> documents = snapshot.data?.docs ?? [];
 
-              return Column(
-              children:
-                documents.map((doc) { // map applies the function to all docs in the document List
-                String imageName = doc['title'];
-                return ListTile( 
-                  title: Text('$imageName'), 
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () {
+                  if (documents.isEmpty) {
+                    return Text('No documents found with current filters.');
+                  }
 
-                    },
-                  )
+                  return Column(
+                    children: documents.map((doc) {
+                      String imageName = doc['title'];
+                      String documentID = doc.id; // reference in case of deleting
+                      String imageURL = doc['imageURL']; // reference in case of deleting
+
+                      return Card(
+                        child: ListTile(
+                          title: Text('$imageName'),
+                          trailing: IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () async {
+                                        
+                                bool deletionConfirmation = await showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    content: Text('Are you sure you want to delete this file?'),
+                                    actions: [
+                                      TextButton(
+                                        child: Text('Cancel'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop(false);
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: Text('Delete'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop(true); 
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                        
+                              if (deletionConfirmation == true) {
+                        
+                                await db.collection("images").doc(documentID).delete();
+                                await FirebaseStorage.instance.refFromURL(imageURL).delete();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('File Deleted'),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ),
                       );
                     }).toList(),
                   );
