@@ -13,6 +13,12 @@ class _AccountDataState extends State<AccountData> {
   final user = FirebaseAuth.instance.currentUser!;
   TextEditingController newValue = TextEditingController();
 
+  @override
+  void dispose() {
+    newValue.dispose();
+    super.dispose();
+  }
+
   void clearText() {
     newValue.clear();
   }
@@ -33,11 +39,51 @@ class _AccountDataState extends State<AccountData> {
         .catchError((error) => print('failed to update user: $error'));
   }
 
-  Future<void> updatePassword() {
-    return user
-        .updatePassword(newValue.text.trim())
-        .then((value) => print('user email updated'))
-        .catchError((error) => print('failed to update user: $error'));
+  Future<void> updatePassword() async {
+    try {
+      String password = newValue.text.trim();
+
+      AuthCredential credential =
+          EmailAuthProvider.credential(email: user.email!, password: password);
+
+      await user.reauthenticateWithCredential(credential);
+
+      TextEditingController newPass = TextEditingController();
+
+      return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Change password'),
+          content: TextField(
+            autofocus: true,
+            decoration: const InputDecoration(hintText: 'Enter new password'),
+            controller: newPass,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => {clearText(), Navigator.pop(context)},
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => {
+                user
+                    .updatePassword(newPass.text.trim())
+                    .then((value) => print('user password updated'))
+                    .catchError(
+                        (error) => print('failed to update user: $error')),
+                clearText(),
+                Navigator.pop(context)
+              },
+              child: const Text('Save'),
+            )
+          ],
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+        ),
+      );
+    } catch (e) {
+      print('error during reauthentication: $e');
+      setState(() {});
+    }
   }
 
   @override
@@ -170,7 +216,7 @@ class _AccountDataState extends State<AccountData> {
                               content: TextField(
                                 autofocus: true,
                                 decoration: const InputDecoration(
-                                    hintText: 'Enter new password'),
+                                    hintText: 'Reenter current password'),
                                 controller: newValue,
                               ),
                               actions: [
@@ -182,9 +228,10 @@ class _AccountDataState extends State<AccountData> {
                                 TextButton(
                                   onPressed: () => {
                                     updatePassword(),
+                                    clearText(),
                                     Navigator.pop(context)
                                   },
-                                  child: const Text('Save'),
+                                  child: const Text('OK'),
                                 )
                               ],
                               shape: RoundedRectangleBorder(
