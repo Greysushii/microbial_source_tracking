@@ -169,7 +169,13 @@ class _HistoryPageState extends State<HistoryPage> {
                 documents.map((doc) { // map applies the function to all docs in the document List
                 String imageName = doc['title'];
                 return ListTile( 
-                  title: Text('$imageName')
+                  title: Text('$imageName'), 
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+
+                    },
+                  )
                       );
                     }).toList(),
                   );
