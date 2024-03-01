@@ -11,31 +11,33 @@ class AccountData extends StatefulWidget {
 
 class _AccountDataState extends State<AccountData> {
   final user = FirebaseAuth.instance.currentUser!;
+  TextEditingController newValue = TextEditingController();
 
-  Future<void> editField(String field) async {
-    String newValue = "";
-    await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: Text('Change $field'),
-              content: TextField(
-                autofocus: true,
-                decoration: InputDecoration(
-                    hintText: "Enter new ${field.toLowerCase()}"),
-              ),
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text('Cancel')),
-                TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text('Save')),
-              ],
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5)),
-            ));
+  void clearText() {
+    newValue.clear();
+  }
 
-    // Firebase interaction goes here
+  Future<void> updateUser(String field) {
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .update({field: newValue.text.trim()})
+        .then((value) => print('user updated'))
+        .catchError((error) => print('failed to update user: $error'));
+  }
+
+  Future<void> updateEmail() {
+    return user
+        .verifyBeforeUpdateEmail(newValue.text.trim())
+        .then((value) => print('user email updated'))
+        .catchError((error) => print('failed to update user: $error'));
+  }
+
+  Future<void> updatePassword() {
+    return user
+        .updatePassword(newValue.text.trim())
+        .then((value) => print('user email updated'))
+        .catchError((error) => print('failed to update user: $error'));
   }
 
   @override
@@ -45,7 +47,7 @@ class _AccountDataState extends State<AccountData> {
         body: StreamBuilder<DocumentSnapshot>(
           stream: FirebaseFirestore.instance
               .collection('users')
-              .doc(user.email)
+              .doc(user.uid)
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
@@ -53,39 +55,142 @@ class _AccountDataState extends State<AccountData> {
 
               return ListView(
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(left: 22),
-                    child: Text(
-                      'My details',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-
                   // user email
                   buildAccountDataCard(
                     title: 'Email',
-                    value: user.email ?? '',
-                    onEditPressed: () => editField('Email'),
+                    value: userData['email'] ?? '',
+                    onEditPressed: () => showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Change email'),
+                        content: TextField(
+                          autofocus: true,
+                          decoration: const InputDecoration(
+                              hintText: 'Enter new email'),
+                          controller: newValue,
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () =>
+                                {clearText(), Navigator.pop(context)},
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () => {
+                              updateEmail(),
+                              updateUser('email'),
+                              clearText(),
+                              Navigator.pop(context)
+                            },
+                            child: const Text('Save'),
+                          )
+                        ],
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5)),
+                      ),
+                    ),
                   ),
 
                   // user first name
                   buildAccountDataCard(
                       title: 'First name',
                       value: userData['firstname'] ?? '',
-                      onEditPressed: () => editField('First Name')),
+                      onEditPressed: () => showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Change first name'),
+                              content: TextField(
+                                autofocus: true,
+                                decoration: const InputDecoration(
+                                    hintText: 'Enter new name'),
+                                controller: newValue,
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      {clearText(), Navigator.pop(context)},
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () => {
+                                    updateUser('firstname'),
+                                    clearText(),
+                                    Navigator.pop(context)
+                                  },
+                                  child: const Text('Save'),
+                                )
+                              ],
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5)),
+                            ),
+                          )),
 
                   // user last name
                   buildAccountDataCard(
                       title: 'Last name',
                       value: userData['lastname'] ?? '',
-                      onEditPressed: () => editField('Last Name')),
+                      onEditPressed: () => showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Change last name'),
+                              content: TextField(
+                                autofocus: true,
+                                decoration: const InputDecoration(
+                                    hintText: 'Enter new name'),
+                                controller: newValue,
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      {clearText(), Navigator.pop(context)},
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () => {
+                                    updateUser('lastname'),
+                                    clearText(),
+                                    Navigator.pop(context),
+                                  },
+                                  child: const Text('Save'),
+                                )
+                              ],
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5)),
+                            ),
+                          )),
 
                   // password
                   buildAccountDataCard(
                       title: 'Password',
                       value: '********',
-                      onEditPressed: () => editField('Password')),
+                      onEditPressed: () => showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Change password'),
+                              content: TextField(
+                                autofocus: true,
+                                decoration: const InputDecoration(
+                                    hintText: 'Enter new password'),
+                                controller: newValue,
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      {clearText(), Navigator.pop(context)},
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () => {
+                                    updatePassword(),
+                                    Navigator.pop(context)
+                                  },
+                                  child: const Text('Save'),
+                                )
+                              ],
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5)),
+                            ),
+                          )),
                 ],
               );
             } else if (snapshot.data == null) {

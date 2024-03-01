@@ -57,7 +57,7 @@ Future<void> registerUser() async {
 
     FirebaseFirestore.instance
         .collection('users')
-        .doc(credential.user!.email)
+        .doc(credential.user!.uid)
         .set({
       'firstname': userFirstName.text.trim(),
       'lastname': userLastName.text.trim(),
