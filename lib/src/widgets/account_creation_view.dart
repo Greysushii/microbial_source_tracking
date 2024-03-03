@@ -36,14 +36,29 @@ class RegisterState extends State<RegisterAccount> {
         issueContent = "This is the default error.";
         break;
       case 1:
+        issueTitle = "Empty fields";
+        issueContent = "Please fill out all fields.";
+        break;
+      case 2:
+        issueTitle = "Password is too weak.";
+        issueContent =
+            "To ensure a strong password, make sure that the Password Strength fields are gone when submitting.";
+        break;
+      case 3:
+        issueTitle = "Passwords do not match";
+        issueContent = "Please make sure both passwords are the same.";
+        break;
+      case 4:
+        issueTitle = "Email in use.";
+        issueContent =
+            "This email is already in use. Please enter a different email, or use 'Forgot password' on the login screen";
+        break;
+      case 5:
         issueTitle = "Success";
         issueContent = "Welcome to our app!";
         break;
-      case 2:
-        issueTitle = "Error";
-        issueContent = "Passwords do not match.";
-        break;
     }
+
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -269,22 +284,33 @@ class RegisterState extends State<RegisterAccount> {
                   setState(() {
                     //Check if the values are the same, and if the boxes are not empty
                     if (kDebugMode) {
-                      print("Strength $passStrength \nConfirm $passConfirm \n");
+                      print(
+                          "Strength $passStrength \nConfirm $passConfirm \nUnique email $uniqueEmail\n");
                     }
-
-                    if (((passStrength & passConfirm) == true)) {
-                      registerUser();
-                      alertMessage(1);
-                      if (kDebugMode) {
-                        print("\t\tEqual!");
-                      }
-                    }
-                    if (((passStrength | passConfirm) == false)) {
+                    //User entered a weak password. Reset password and try again
+                    if (((passStrength) == false)) {
                       alertMessage(2);
                       clearPassword();
-
-                      if (kDebugMode) {
-                        print("\t\tINVALID ALL AROUND");
+                    }
+                    //Password meets strength, but are not equal
+                    if (((passConfirm) == false)) {
+                      alertMessage(3);
+                      clearPassword();
+                    }
+                    //Password is strong, both are equal, and email is unique
+                    if (((passStrength & passConfirm) == true)) {
+                      registerUser();
+                      switch (uniqueEmail) {
+                        case false:
+                          alertMessage(4);
+                          uniqueEmail = true;
+                          break;
+                        case true:
+                          alertMessage(5);
+                          if (kDebugMode) {
+                            print("\t\tEqual!");
+                          }
+                          break;
                       }
                     }
                   });
@@ -333,12 +359,12 @@ bool checkButton() {
 //that slowly are removed as the strength requirements are met.
 String _em = '';
 
-//PassCheckOne is for the first password box, two is for the "confirm"
-//Once confirmed, userPass will become the appropriate password
-
 //For showing/hiding the passwords
 bool passVisible = true;
 bool confirmVisible = true;
+
+//
+bool uniqueEmail = true;
 
 //Clears the passwords after not matching
 void clearPassword() {
@@ -374,38 +400,27 @@ bool strengthRequirements(String userPass) {
 
 Future<void> registerUser() async {
   try {
-    UserCredential credential =
+    final UserCredential =
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: userEmail.text,
       password: userPass.text,
     );
+  } on FirebaseAuthException catch (e) {
+    switch (e.code) {
+      case 'auth/email-already-in-use':
+        uniqueEmail = false;
+        break;
+    }
+  }
+}
+
+/*
     //Add the user into the user collections in Firebase
     FirebaseFirestore.instance.collection('users').add({
       'first name': userFirstName.text.trim(),
       'last name': userLastName.text.trim(),
       'email': userEmail.text.trim(),
-    });
-  } on FirebaseAuthException catch (e) {
-    if (e.code == 'email-already-in-use') {
-      //registerAlert(1);
-      if (kDebugMode) {
-        print('Alert 1: The account already exists for that email.');
-      }
-    } else if (e.code == 'invalid-email') {
-      if (kDebugMode) {
-        print('Email address is badly formatted.');
-      }
-    } /* else {
-      if (kDebugMode) {
-        print('Registration successful!');
-      }
-    } */
-  } catch (e) {
-    if (kDebugMode) {
-      print(e);
-    }
-  }
-}
+    });*/
 
 //Email the user their verification code
 var constructEmail = ActionCodeSettings(
