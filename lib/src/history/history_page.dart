@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,6 @@ class _HistoryPageState extends State<HistoryPage> {
   final db = FirebaseFirestore.instance; // Cloud firestore instance! 
 
   PlatformFile? pickedFile;
-  List<String> selectedFileList = [];
 
   Future selectFile() async {
     final result = await FilePicker.platform.pickFiles();
@@ -35,29 +35,71 @@ class _HistoryPageState extends State<HistoryPage> {
   
   }
 
-  Future uploadFile() async {
 
+  Future uploadFile() async {
+     
     final path = 'images/${pickedFile!.name}';
     final file = File(pickedFile!.path!);
-    final ref = FirebaseStorage.instance.ref().child(path);
-    TaskSnapshot firebaseStorageUpload = await ref.putFile(file); // waiting for FB storage upload to complete before grabbing URL 
 
-    final image = <String, dynamic>{ // creates a test document with fields 
-      "title": "Image 4",
-      "uploadedDate": FieldValue.serverTimestamp(), // grabs timestamp when doc was uploaded
-      "imageURL": await firebaseStorageUpload.ref.getDownloadURL()
-    };
+    String? waterSource = await getWaterSource(); 
 
-    db.collection("images").add(image).then((DocumentReference doc) => // adds that test doc created above to collection 
-    print('DocumentSnapshot added with ID: ${doc.id}'));
+    if (waterSource != null) {
+        final ref = FirebaseStorage.instance.ref().child(path);
+        TaskSnapshot firebaseStorageUpload = await ref.putFile(file); // waiting for FB storage upload to complete before grabbing URL
 
-    pickedFile = null;
+        String currentUserEmail = FirebaseAuth.instance.currentUser?.email ?? "";
 
-    ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('File Uploaded!'),
-        ),
-      );
+        DocumentSnapshot currentUserInfo = await FirebaseFirestore.instance.collection('users').where('email', isEqualTo: 'NotHeisenberg@yahoo.com').get()
+            .then((QuerySnapshot querySnapshot) => querySnapshot.docs.first);
+        
+        
+        final image = <String, dynamic>{ 
+            "title": DateFormat('MMddyyyy').format(actualDate),
+            "uploadedDate": FieldValue.serverTimestamp(), // grabs timestamp when doc was uploaded
+            "imageURL": await firebaseStorageUpload.ref.getDownloadURL(),
+            "lake": waterSource,
+            "uploader's email": currentUserEmail, 
+            "uploader's first name": currentUserInfo['first name'], 
+            "uploader's last name": currentUserInfo['last name']
+          };
+
+        db.collection("images").add(image).then((DocumentReference doc) => // adds doc created above to collection 
+        print('DocumentSnapshot added with ID: ${doc.id}'));
+
+        pickedFile = null;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('File Uploaded!'),
+              ),
+            );
+          }
+
+  }
+
+  Future getWaterSource() async {
+    TextEditingController waterSourceController = TextEditingController(); 
+
+    return showDialog<String>(
+      context: context, 
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Sample Retrieved From: '),
+          content: TextField(
+            controller: waterSourceController, 
+            decoration: InputDecoration(hintText: 'Lake Name'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Done'),
+              onPressed: () {
+                Navigator.pop(context, waterSourceController.text);
+              }
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future showFile(String fileName) async {
@@ -72,11 +114,12 @@ class _HistoryPageState extends State<HistoryPage> {
         );
       },
     );
-
+    
   }
   
-  DateTime currentDate = DateTime.now(); // using DateTime class to grab current date
-
+  DateTime currentDate = DateTime.now(); // using DateTime class to grab current date, which can be modified in the DatePicker below for filtering purposes
+  DateTime actualDate = DateTime.now();
+  
   Stream<QuerySnapshot> getDocumentStream() { // function for filtering documents based on the user's preferred date range then building stream
     DateTime start = DateTime(currentDate.year, currentDate.month, currentDate.day); // define start of range for filtering documents by date
     DateTime end = start.add(Duration(days: 1)); // define end of range for document filtering by date
