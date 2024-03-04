@@ -12,22 +12,18 @@ class _HomeListViewState extends State<HomeListView> {
   //Test information to show flow of data
   final List<String> devices = <String>['Device 1', 'Device 2', 'Device 3'];
   final List<String> recents = <String>[
-    '012924_upload.jpg',
-    '120223_upload.jpg',
-    '122723_upload.jpg',
-    '012724_upload.jpg',
-    '012824_upload.jpg',
-    '121523_upload.jpg',
-    '112723_upload.jpg',
-    '112923_upload.jpg',
-    '010224_upload.jpg',
-    '010324_upload.jpg',
-    '121323_upload.jpg',
+    'lakestclair_022024.jpg',
+    'lakehuron_122723.jpg',
+    'lakehuron_122623.jpg',
+    'lakestclair_012924.jpg',
+    'lakestclair_012824.jpg',
+    'detroitriver_121523.jpg',
+    'lakestclair_112723.jpg',
+    'detroitriver_112923.jpg',
+    'detroitriver_010224.jpg',
+    'lakestclair_010324.jpg',
+    'lakehuron_121323.jpg',
   ];
-
-  // void signUserOut() {
-  //   FirebaseAuth.instance.signOut();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +60,7 @@ class _HomeListViewState extends State<HomeListView> {
             ),
             const Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Text('Most Recent Pictures',
+                child: Text('Most Recent Experimental Data',
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 17))),
             Expanded(

@@ -1,7 +1,9 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../firebase_options.dart';
 
@@ -10,6 +12,8 @@ FirebaseAuth auth = FirebaseAuth.instance;
 //Save the user's email and password when entering
 TextEditingController userEmail = TextEditingController();
 TextEditingController userPass = TextEditingController();
+TextEditingController userFirstName = TextEditingController();
+TextEditingController userLastName = TextEditingController();
 
 //PassCheckOne is for the first password box, two is for the "confirm"
 //Once confirmed, userPass will become the appropriate password
@@ -45,11 +49,20 @@ void clearPassword() {
 
 Future<void> registerUser() async {
   try {
-    final credential =
+    UserCredential credential =
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: userEmail.text,
       password: userPass.text,
     );
+
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(credential.user!.uid)
+        .set({
+      'firstname': userFirstName.text.trim(),
+      'lastname': userLastName.text.trim(),
+      'email': userEmail.text.trim(),
+    });
   } on FirebaseAuthException catch (e) {
     if (e.code == 'weak-password') {
       if (kDebugMode) {
@@ -105,7 +118,9 @@ class MyApp extends StatelessWidget {
 }*/
 
 class RegisterAccount extends StatefulWidget {
-  const RegisterAccount({super.key,});
+  const RegisterAccount({
+    super.key,
+  });
   //final String title;
 
   @override
@@ -153,6 +168,32 @@ class RegisterState extends State<RegisterAccount> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            // user enters first name
+            Container(
+              margin: const EdgeInsets.symmetric(
+                horizontal: 50,
+              ),
+              child: TextFormField(
+                controller: userFirstName,
+                decoration: const InputDecoration(
+                  labelText: 'First Name',
+                ),
+              ),
+            ),
+
+            // user enters last name
+            Container(
+              margin: const EdgeInsets.symmetric(
+                horizontal: 50,
+              ),
+              child: TextFormField(
+                controller: userLastName,
+                decoration: const InputDecoration(
+                  labelText: 'Last Name',
+                ),
+              ),
+            ),
+
             //Enter in their email (required)
             Container(
               margin: const EdgeInsets.symmetric(
