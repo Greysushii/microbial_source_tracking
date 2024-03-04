@@ -39,10 +39,17 @@ final List<Setting> settings = [
   //   route: '/',
   //   icon: Icons.exit_to_app,
   // ),
+  // Setting(
+  //   title: 'Log Out',
+  //   route: '/',
+  //   icon: Icons.exit_to_app,
+  // ),
 ];
 
 // final List<Setting> settings2 = [
 //   Setting(
+//     title: 'FAQ',
+//     route: '/',
 //     title: 'FAQ',
 //     route: '/',
 //     icon: Icons.question_mark,
@@ -50,14 +57,20 @@ final List<Setting> settings = [
 //   Setting(
 //     title: 'Contact Us',
 //     route: '/',
+//     title: 'Contact Us',
+//     route: '/',
 //     icon: Icons.phone,
 //   ),
 //   Setting(
 //     title: 'Help Us',
 //     route: '/',
+//     title: 'Help Us',
+//     route: '/',
 //     icon: Icons.handshake,
 //   ),
 //   Setting(
+//     title: 'Log Out',
+//     route: '/',
 //     title: 'Log Out',
 //     route: '/',
 //     icon: Icons.exit_to_app,
