@@ -6,6 +6,35 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+FirebaseAuth auth = FirebaseAuth.instance;
+
+//Save the user's email and password when entering
+TextEditingController userEmail = TextEditingController();
+TextEditingController userFirstName = TextEditingController();
+TextEditingController userLastName = TextEditingController();
+TextEditingController userPass = TextEditingController();
+TextEditingController userPassConfirm = TextEditingController();
+
+bool passStrength =
+    false; //Initial password requirement check. default is false,
+//true once the password field meets password strength requirement
+bool passConfirm = false; //Once both passwords are equal, this becomes true
+
+bool uniqueEmail = true;
+
+//Hide the sign up button until all fields are filled
+bool checkButton() {
+  if ((userEmail.text.isEmpty |
+      userFirstName.text.isEmpty |
+      userLastName.text.isEmpty |
+      userPass.text.isEmpty |
+      userPassConfirm.text.isEmpty)) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
 //RegisterAccount is the name of this widget,
 //refer to RegisterAccount for routing purposes
 class RegisterAccount extends StatefulWidget {
@@ -78,6 +107,58 @@ class RegisterState extends State<RegisterAccount> {
       },
     );
   }
+
+  Future<void> registerUser() async {
+    try {
+      final UserCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: userEmail.text,
+        password: userPass.text,
+      );
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'email-already-in-use':
+          uniqueEmail = false;
+        //emailCheckAndStore();
+        //alertMessage(4);
+        //throw FirebaseAuthException('This email already exists');
+        case "invalid-email":
+          uniqueEmail = false;
+          break;
+      }
+    } catch (e) {
+      //uniqueEmail = false;
+      if (kDebugMode) {
+        print(e);
+      }
+    }
+    emailCheckAndStore();
+  }
+
+//
+
+  Future<void> emailCheckAndStore() async {
+    switch (uniqueEmail) {
+      case (true):
+        FirebaseFirestore.instance.collection('users').add({
+          'first name': userFirstName.text.trim(),
+          'last name': userLastName.text.trim(),
+          'email': userEmail.text.trim(),
+        });
+        alertMessage(5);
+        break;
+      case (false):
+        alertMessage(4);
+        break;
+    }
+  }
+/*
+    //Add the user into the user collections in Firebase
+    FirebaseFirestore.instance.collection('users').add({
+      'first name': userFirstName.text.trim(),
+      'last name': userLastName.text.trim(),
+      'email': userEmail.text.trim(),
+    });*/
 
   @override
   Widget build(BuildContext context) {
@@ -284,34 +365,26 @@ class RegisterState extends State<RegisterAccount> {
                   setState(() {
                     //Check if the values are the same, and if the boxes are not empty
                     if (kDebugMode) {
-                      print(
-                          "Strength $passStrength \nConfirm $passConfirm \nUnique email $uniqueEmail\n");
+                      print("Strength $passStrength \nConfirm $passConfirm \n");
+                    } //Unique email $uniqueEmail\n
+                    //User entered nothing
+                    if (((checkButton()) == false)) {
+                      alertMessage(1);
                     }
                     //User entered a weak password. Reset password and try again
-                    if (((passStrength) == false)) {
+                    else if (((passStrength) == false)) {
                       alertMessage(2);
                       clearPassword();
                     }
                     //Password meets strength, but are not equal
-                    if (((passConfirm) == false)) {
+                    else if (((passConfirm) == false)) {
                       alertMessage(3);
                       clearPassword();
                     }
                     //Password is strong, both are equal, and email is unique
-                    if (((passStrength & passConfirm) == true)) {
+                    else if (((passStrength & passConfirm) == true)) {
                       registerUser();
-                      switch (uniqueEmail) {
-                        case false:
-                          alertMessage(4);
-                          uniqueEmail = true;
-                          break;
-                        case true:
-                          alertMessage(5);
-                          if (kDebugMode) {
-                            print("\t\tEqual!");
-                          }
-                          break;
-                      }
+                      uniqueEmail = true;
                     }
                   });
                 },
@@ -323,123 +396,66 @@ class RegisterState extends State<RegisterAccount> {
       ),
     );
   }
-}
 
 //Functions!--------------------------------------------------------------------
 
-FirebaseAuth auth = FirebaseAuth.instance;
-
-//Save the user's email and password when entering
-TextEditingController userEmail = TextEditingController();
-TextEditingController userFirstName = TextEditingController();
-TextEditingController userLastName = TextEditingController();
-TextEditingController userPass = TextEditingController();
-TextEditingController userPassConfirm = TextEditingController();
-
-bool passStrength =
-    false; //Initial password requirement check. default is false,
-//true once the password field meets password strength requirement
-bool passConfirm = false; //Once both passwords are equal, this becomes true
-
-//Hide the sign up button until all fields are filled
-
-bool checkButton() {
-  if ((userEmail.text.isEmpty |
-      userFirstName.text.isEmpty |
-      userLastName.text.isEmpty |
-      userPass.text.isEmpty |
-      userPassConfirm.text.isEmpty)) {
-    return false;
-  } else {
-    return true;
-  }
-}
-
 //Error message that appears when creating a password, holds all the requirements
 //that slowly are removed as the strength requirements are met.
-String _em = '';
+  String _em = '';
 
 //For showing/hiding the passwords
-bool passVisible = true;
-bool confirmVisible = true;
-
-//
-bool uniqueEmail = true;
+  bool passVisible = true;
+  bool confirmVisible = true;
 
 //Clears the passwords after not matching
-void clearPassword() {
-  userPass.clear();
-  userPassConfirm.clear();
-}
-
-bool strengthRequirements(String userPass) {
-  //Reset error message
-  _em = '';
-  //Returns true if any of these values "fail"
-  if (userPass.length < 8) {
-    _em += '• Minimum 8 characters.\n';
-  }
-  if (userPass.length > 20) {
-    _em += '• Maximum 20 characters.\n';
-  }
-  if (!userPass.contains(RegExp(r'[A-Z]'))) {
-    _em += '• 1 uppercase.\n';
-  }
-  if (!userPass.contains(RegExp(r'[a-z]'))) {
-    _em += '• 1 lowercase.\n';
-  }
-  if (!userPass.contains(RegExp(r'[~!@#\\$%^&*(),.?":{}|<>]'))) {
-    _em += '• 1 special character.\n';
-  }
-  if (!userPass.contains(RegExp(r'\d'))) {
-    _em += '• 1 number.\n';
+  void clearPassword() {
+    userPass.clear();
+    userPassConfirm.clear();
   }
 
-  return _em.isEmpty;
-}
-
-Future<void> registerUser() async {
-  try {
-    final UserCredential =
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: userEmail.text,
-      password: userPass.text,
-    );
-  } on FirebaseAuthException catch (e) {
-    switch (e.code) {
-      case 'auth/email-already-in-use':
-        uniqueEmail = false;
-        break;
+  bool strengthRequirements(String userPass) {
+    //Reset error message
+    _em = '';
+    //Returns true if any of these values "fail"
+    if (userPass.length < 8) {
+      _em += '• Minimum 8 characters.\n';
     }
-  }
-}
+    if (userPass.length > 20) {
+      _em += '• Maximum 20 characters.\n';
+    }
+    if (!userPass.contains(RegExp(r'[A-Z]'))) {
+      _em += '• 1 uppercase.\n';
+    }
+    if (!userPass.contains(RegExp(r'[a-z]'))) {
+      _em += '• 1 lowercase.\n';
+    }
+    if (!userPass.contains(RegExp(r'[~!@#\\$%^&*(),.?":{}|<>]'))) {
+      _em += '• 1 special character.\n';
+    }
+    if (!userPass.contains(RegExp(r'\d'))) {
+      _em += '• 1 number.\n';
+    }
 
-/*
-    //Add the user into the user collections in Firebase
-    FirebaseFirestore.instance.collection('users').add({
-      'first name': userFirstName.text.trim(),
-      'last name': userLastName.text.trim(),
-      'email': userEmail.text.trim(),
-    });*/
+    return _em.isEmpty;
+  }
 
 //Email the user their verification code
-var constructEmail = ActionCodeSettings(
-  url: 'glwa-app.firebaseapp.com',
-  handleCodeInApp: true,
-  iOSBundleId: 'com.example.ios',
-  androidPackageName: 'com.example.android',
-);
-
-var emailAuth = userEmail;
+  var constructEmail = ActionCodeSettings(
+    url: 'glwa-app.firebaseapp.com',
+    handleCodeInApp: true,
+    iOSBundleId: 'com.example.ios',
+    androidPackageName: 'com.example.android',
+  );
 
 //Dialog box for passwords not matching
-AlertDialog passNotMatch = const AlertDialog(
-  title: Text("Registration error"),
-  content: Text("Passwords do not match."),
-);
+  AlertDialog passNotMatch = const AlertDialog(
+    title: Text("Registration error"),
+    content: Text("Passwords do not match."),
+  );
 
 /* //Dialog box for passwords not matching
 AlertDialog passNotMatch = const AlertDialog(
   title: Text("Registration error"),
   content: Text("Passwords do not match."),
 ); */
+}
