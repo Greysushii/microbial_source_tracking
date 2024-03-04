@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 
 class HistoryPage extends StatefulWidget {
@@ -37,44 +39,53 @@ class _HistoryPageState extends State<HistoryPage> {
 
 
   Future uploadFile() async {
-     
-    final path = 'images/${pickedFile!.name}';
-    final file = File(pickedFile!.path!);
+    
+    var locationPermissionStatus = await Permission.location.request();
 
-    String? waterSource = await getWaterSource(); 
+    if (locationPermissionStatus == PermissionStatus.granted) {
+      final path = 'images/${pickedFile!.name}';
+      final file = File(pickedFile!.path!);
 
-    if (waterSource != null) {
+      String? waterSource = await getWaterSource();
+
+      if (waterSource != null) {
         final ref = FirebaseStorage.instance.ref().child(path);
         TaskSnapshot firebaseStorageUpload = await ref.putFile(file); // waiting for FB storage upload to complete before grabbing URL
 
         String currentUserEmail = FirebaseAuth.instance.currentUser?.email ?? "";
 
         DocumentSnapshot currentUserInfo = await FirebaseFirestore.instance.collection('users').where('email', isEqualTo: 'NotHeisenberg@yahoo.com').get()
-            .then((QuerySnapshot querySnapshot) => querySnapshot.docs.first);
-        
-        
-        final image = <String, dynamic>{ 
-            "title": DateFormat('MMddyyyy').format(actualDate),
-            "uploadedDate": FieldValue.serverTimestamp(), // grabs timestamp when doc was uploaded
-            "imageURL": await firebaseStorageUpload.ref.getDownloadURL(),
-            "lake": waterSource,
-            "uploader's email": currentUserEmail, 
-            "uploader's first name": currentUserInfo['first name'], 
-            "uploader's last name": currentUserInfo['last name']
-          };
+          .then((QuerySnapshot querySnapshot) => querySnapshot.docs.first);
 
-        db.collection("images").add(image).then((DocumentReference doc) => // adds doc created above to collection 
+        String uploadedDate = DateFormat('MM-dd-yyyy').format(actualDate);
+
+  
+        var userLocation = await Geolocator.getCurrentPosition();
+
+        final image = <String, dynamic>{
+          "title": '$waterSource $uploadedDate',
+          "uploadedDate": FieldValue.serverTimestamp(),
+          "imageURL": await firebaseStorageUpload.ref.getDownloadURL(),
+          "lake": waterSource,
+          "uploader's email": currentUserEmail,
+          "uploader's first name": currentUserInfo['first name'],
+          "uploader's last name": currentUserInfo['last name'],
+          "latitude": userLocation.latitude,
+          "longitude": userLocation.longitude, 
+        };
+
+        db.collection("images").add(image).then((DocumentReference doc) => // adds doc created above to collection
         print('DocumentSnapshot added with ID: ${doc.id}'));
 
         pickedFile = null;
 
         ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('File Uploaded!'),
-              ),
-            );
-          }
-
+          const SnackBar(
+            content: Text('File Uploaded!'),
+          ),
+        );
+      }
+    }
   }
 
   Future getWaterSource() async {
@@ -102,15 +113,41 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Future showFile(String fileName) async {
-      
-    var response = await FirebaseStorage.instance.ref('images/$fileName').getDownloadURL();
+  Future showFile(QueryDocumentSnapshot doc) async {
 
+      String imageName = doc['title'];
+      String imageURL = doc['imageURL'];
+      String uploaderEmail = doc["uploader's email"];
+      String uploaderFirstName = doc["uploader's first name"];
+      String uploaderLastName = doc["uploader's last name"];
+      String uploadTime = DateFormat('HH:mm').format(doc['uploadedDate'].toDate());
+      double latitude = doc['latitude'];
+      double longitude = doc['longitude'];
+      
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: Image.network(response),
+          content: Container(
+            padding: const EdgeInsets.all(8.0), 
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+            Image.network(imageURL),
+            SizedBox(height: 10),
+            Text('$imageName'), 
+            Text('Latitude: $latitude'), 
+            Text('Longitude: $longitude'),
+            Text('Upload Time: $uploadTime'),
+            Text('Uploader\'s Email: $uploaderEmail'),
+            Text('Uploader\'s First Name: $uploaderFirstName'),
+            Text('Uploader\'s Last Name: $uploaderLastName')
+            ],
+            )
+          )
         );
       },
     );
@@ -217,10 +254,12 @@ class _HistoryPageState extends State<HistoryPage> {
                       return Card(
                         child: ListTile(
                           title: Text('$imageName'),
+                          onTap: () {
+                            showFile(doc);
+                          },
                           trailing: IconButton(
                             icon: Icon(Icons.delete),
                             onPressed: () async {
-                                        
                                 bool deletionConfirmation = await showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
