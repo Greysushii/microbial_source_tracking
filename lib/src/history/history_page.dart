@@ -70,14 +70,21 @@ class _HistoryPageState extends State<HistoryPage> {
           "uploader's email": currentUserEmail,
           "uploader's first name": currentUserInfo['first name'],
           "uploader's last name": currentUserInfo['last name'],
-          "latitude": userLocation.latitude,
+          "latitude": userLocation.latitude, 
           "longitude": userLocation.longitude, 
         };
 
-        db.collection("images").add(image).then((DocumentReference doc) => // adds doc created above to collection
-        print('DocumentSnapshot added with ID: ${doc.id}'));
+        await db.collection("images").add(image).then((DocumentReference doc) { // adds doc created above to collection
+          print('DocumentSnapshot added with ID: ${doc.id}');
+          
+          setState(() {
+            pickedFile = null;
+          });
 
-        pickedFile = null;
+        });
+        
+
+        
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -153,159 +160,239 @@ class _HistoryPageState extends State<HistoryPage> {
     );
     
   }
+
+  Future showSelectedFile() async {
+    if (pickedFile != null) {
+      File file = File(pickedFile!.path!);
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Image.file(file),
+          );
+        },
+      );
+    }
+  }
   
   DateTime currentDate = DateTime.now(); // using DateTime class to grab current date, which can be modified in the DatePicker below for filtering purposes
   DateTime actualDate = DateTime.now();
+
+  bool showAllDocuments = true;
   
   Stream<QuerySnapshot> getDocumentStream() { // function for filtering documents based on the user's preferred date range then building stream
-    DateTime start = DateTime(currentDate.year, currentDate.month, currentDate.day); // define start of range for filtering documents by date
-    DateTime end = start.add(Duration(days: 1)); // define end of range for document filtering by date
 
-    return FirebaseFirestore.instance.collection('images').where('uploadedDate', isGreaterThanOrEqualTo: start).where('uploadedDate', isLessThan: end).snapshots();
-    // returning docs fitting the desired date range
+    if (showAllDocuments == true) {
+      return FirebaseFirestore.instance.collection("images").orderBy('uploadedDate', descending: true).snapshots();
+    }
+
+    else {
+
+    
+      DateTime start = DateTime(currentDate.year, currentDate.month, currentDate.day); // define start of range for filtering documents by date
+      DateTime end = start.add(Duration(days: 1)); // define end of range for document filtering by date
+
+      return FirebaseFirestore.instance.collection('images').where('uploadedDate', isGreaterThanOrEqualTo: start).where('uploadedDate', isLessThan: end).orderBy('uploadedDate', descending: true).snapshots();
+      // returning docs fitting the desired date range
+  
+    }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('History'),
-        
-      ),
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        TextButton( 
-                          child: Text(
-                            'Upload Date: ${DateFormat('MM-dd-yyyy').format(currentDate)}', // shows user the current selected date range with yyyy-mm-dd format
-                          ),
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('History'),
+    ),
+    body: SingleChildScrollView(
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    selectFile();
+                  },
+                  child: const Row(
+                    children: [
+                      Icon(Icons.cloud_upload),
+                      SizedBox(width: 9),
+                      Text('Select File', 
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
+                      ),
+                    ],
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    uploadFile();
+                  },
+                  child: const Row(
+                    children: [
+                      Icon(Icons.cloud_upload),
+                      SizedBox(width: 9),
+                      Text('Upload File', 
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            // Display selected file information or placeholder
+            pickedFile != null ? 
+              Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: Card(
+                    child: ListTile(
+                        title: Text(
+                          'Selected file: ${pickedFile!.name}', 
+                           textAlign: TextAlign.center),
+                        onTap: () {
+                          showSelectedFile(); // Replace this with your function to show the image
+                        },
+                      ),
+                  ),
+                )
+            : Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: const Card(
+                    child: ListTile(
+                        title: Text(
+                          'Selected file appears here',
+                          style: TextStyle( 
+                            fontStyle: FontStyle.italic,
+                          ),          
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                  ),
+                ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      TextButton(
+                        child: const Text(
+                          "Select Date", 
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
+                        ),
+                        onPressed: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: currentDate,
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime.now(),
+                          );
+                          if (pickedDate != null) {
+                            setState(() {
+                              currentDate = pickedDate;
+                              showAllDocuments = false; 
+                            });
+                          } else {
+                            setState(() {
+                              showAllDocuments = true; 
+                            });
+                          }
+                        },
+                      ),
+                      Icon(Icons.date_range),
+                    ],
+                  ),
+                ),
+                TextButton(
+                  child: Text('Reset'),
+                  onPressed: () {
+                    setState(() {
+                      showAllDocuments = true; 
+                    });
+                  },
+                ),
+              ],
+            ),
+            Text( 
+              showAllDocuments ? 'All History' : 'History From: ${DateFormat('MM-dd-yyyy').format(currentDate)}', 
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
+            ),
+            StreamBuilder<QuerySnapshot>(
+              stream: getDocumentStream(),
+              builder: (context, snapshot) {
+                List<QueryDocumentSnapshot> documents = snapshot.data?.docs ?? [];
+
+                if (documents.isEmpty) {
+                  return Text('No files found.');
+                }
+
+                return Column(
+                  children: documents.map((doc) {
+                    String imageName = doc['title'];
+                    String documentID = doc.id; // reference in case of deleting
+                    String imageURL = doc['imageURL']; // reference in case of deleting
+
+                    return Card(
+                      child: ListTile(
+                        title: Text('$imageName'),
+                        onTap: () {
+                          showFile(doc);
+                        },
+                        trailing: IconButton(
+                          icon: Icon(Icons.delete),
                           onPressed: () async {
-                            DateTime? pickedDate = await showDatePicker( // From flutter material library: creates drop-down calendar for user to pick date
-                              context: context,                              
-                              initialDate: currentDate,   // user opens calendar, first sees currently set date (Today if filter date not set yet)
-                              firstDate: DateTime(2000), // starting year for calendar
-                              lastDate: DateTime.now(), // ending date (today's date)
+                            bool deletionConfirmation = await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  content: Text('Are you sure you want to delete this file?'),
+                                  actions: [
+                                    TextButton(
+                                      child: Text('Cancel'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop(false);
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: Text('Delete'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop(true);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
                             );
-                            if (pickedDate != null) {
-                              setState(() {
-                                currentDate = pickedDate; // changes current date for filter based on user input
-                              });
+
+                            if (deletionConfirmation == true) {
+                              await db.collection("images").doc(documentID).delete();
+                              await FirebaseStorage.instance.refFromURL(imageURL).delete();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('File Deleted'),
+                                ),
+                              );
                             }
                           },
                         ),
-                        Icon(Icons.date_range),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      TextButton(
-                      onPressed: () {
-                      selectFile();
-                    },
-                    child: const Row(
-                      children: [
-                        Icon(Icons.cloud_upload),
-                        SizedBox(width: 9),
-                        Text('Select File'),
-                      ],
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      uploadFile();
-                    },
-                    child: const Row(
-                      children: [
-                        Icon(Icons.cloud_upload),
-                        SizedBox(width: 9),
-                        Text('Upload File'),
-                      ],
-                    ),
-                  )],),
-
-              StreamBuilder<QuerySnapshot>(
-                stream: getDocumentStream(),
-                builder: (context, snapshot) {
-                  List<QueryDocumentSnapshot> documents = snapshot.data?.docs ?? [];
-
-                  if (documents.isEmpty) {
-                    return Text('No documents found with current filters.');
-                  }
-
-                  return Column(
-                    children: documents.map((doc) {
-                      String imageName = doc['title'];
-                      String documentID = doc.id; // reference in case of deleting
-                      String imageURL = doc['imageURL']; // reference in case of deleting
-
-                      return Card(
-                        child: ListTile(
-                          title: Text('$imageName'),
-                          onTap: () {
-                            showFile(doc);
-                          },
-                          trailing: IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () async {
-                                bool deletionConfirmation = await showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    content: Text('Are you sure you want to delete this file?'),
-                                    actions: [
-                                      TextButton(
-                                        child: Text('Cancel'),
-                                        onPressed: () {
-                                          Navigator.of(context).pop(false);
-                                        },
-                                      ),
-                                      TextButton(
-                                        child: Text('Delete'),
-                                        onPressed: () {
-                                          Navigator.of(context).pop(true); 
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                        
-                              if (deletionConfirmation == true) {
-                        
-                                await db.collection("images").doc(documentID).delete();
-                                await FirebaseStorage.instance.refFromURL(imageURL).delete();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('File Deleted'),
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  );
-                },
-              ),
-            ],
-          ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 }
 // search bar: search by date, location, and person who took the data. Nothing else is needed
