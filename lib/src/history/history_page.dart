@@ -245,7 +245,7 @@ Widget build(BuildContext context) {
               ],
             ),
 
-            // Display selected file information or placeholder
+            
             pickedFile != null ? 
               Container(
                   width: MediaQuery.of(context).size.width * 0.8,
@@ -255,7 +255,7 @@ Widget build(BuildContext context) {
                           'Selected file: ${pickedFile!.name}', 
                            textAlign: TextAlign.center),
                         onTap: () {
-                          showSelectedFile(); // Replace this with your function to show the image
+                          showSelectedFile(); 
                         },
                       ),
                   ),
