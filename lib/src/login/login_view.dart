@@ -50,26 +50,6 @@ class LoginView extends StatelessWidget {
                         ]),
                   ),
                   const SizedBox(height: 10),
-
-                  // // Sign in button
-                  // GestureDetector(
-                  //   onTap: signUserIn,
-                  //   child: Container(
-                  //     padding: const EdgeInsets.all(20),
-                  //     margin: const EdgeInsets.symmetric(horizontal: 30),
-                  //     decoration: BoxDecoration(
-                  //         color: const Color.fromARGB(255, 52, 52, 52),
-                  //         borderRadius: BorderRadius.circular(8)),
-                  //     child: const Center(
-                  //         child: Text(
-                  //       'Sign in',
-                  //       style: TextStyle(
-                  //         color: Colors.white,
-                  //         fontWeight: FontWeight.bold,
-                  //       ),
-                  //     )),
-                  //   ),
-                  // ),
                 ],
               )),
         ),

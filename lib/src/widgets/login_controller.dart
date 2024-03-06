@@ -97,8 +97,8 @@ class _LoginState extends State<Login> {
             GestureDetector(
               onTap: (signUserIn),
               child: Container(
-                padding: const EdgeInsets.all(20),
-                margin: const EdgeInsets.symmetric(horizontal: 30),
+                padding: const EdgeInsets.all(15),
+                margin: const EdgeInsets.symmetric(horizontal: 100),
                 decoration: BoxDecoration(
                     color: const Color.fromARGB(255, 52, 52, 52),
                     borderRadius: BorderRadius.circular(8)),
@@ -106,6 +106,7 @@ class _LoginState extends State<Login> {
                     child: Text(
                   'Sign in',
                   style: TextStyle(
+                    fontSize: 17,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),

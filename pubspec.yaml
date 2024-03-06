@@ -23,11 +23,11 @@ dependencies:
   firebase_storage: 11.6.0
   intl: ^0.18.0
   geolocator: ^8.0.0 # get phone location 
-  permission_handler: ^11.3.0 #handles permission for accessing phone location
+  permission_handler: ^11.3.0 # handles permission for accessing phone location
 
 
   flutter_gen: any
-  cloud_firestore: ^4.15.4
+  cloud_firestore: ^4.15.5
 dev_dependencies:
   flutter_test:
     sdk: flutter
