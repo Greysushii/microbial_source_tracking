@@ -54,11 +54,11 @@ class _HistoryPageState extends State<HistoryPage> {
 
         String currentUserEmail = FirebaseAuth.instance.currentUser?.email ?? "";
 
-        DocumentSnapshot currentUserInfo = await FirebaseFirestore.instance.collection('users').where('email', isEqualTo: 'NotHeisenberg@yahoo.com').get()
-          .then((QuerySnapshot querySnapshot) => querySnapshot.docs.first);
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('users').where('email', isEqualTo: currentUserEmail).get(); //it wasnt working bc CASE SENSITIVE im actually sad lmfao
+        
+        DocumentSnapshot currentUserInfo = querySnapshot.docs.first;
 
         String uploadedDate = DateFormat('MM-dd-yyyy').format(actualDate);
-
   
         var userLocation = await Geolocator.getCurrentPosition();
 
@@ -68,8 +68,8 @@ class _HistoryPageState extends State<HistoryPage> {
           "imageURL": await firebaseStorageUpload.ref.getDownloadURL(),
           "lake": waterSource,
           "uploader's email": currentUserEmail,
-          "uploader's first name": currentUserInfo['first name'],
-          "uploader's last name": currentUserInfo['last name'],
+          "uploader's first name": currentUserInfo['firstname'],
+          "uploader's last name": currentUserInfo['lastname'],
           "latitude": userLocation.latitude, 
           "longitude": userLocation.longitude, 
         };
@@ -175,6 +175,81 @@ class _HistoryPageState extends State<HistoryPage> {
       );
     }
   }
+
+  Future getLakeOptions() async {
+
+    QuerySnapshot lakeQuery = await FirebaseFirestore.instance.collection('images').orderBy('lake').get();
+
+    List<String> lakeOptions = lakeQuery.docs.map((doc) => (doc['lake'] as String?) ?? "").toSet().toList();
+
+    return lakeOptions;
+
+  }
+
+  Future openLakeOptions() async {
+    
+    List<String> selectedLakes = [];
+
+    List<String> lakeChoices = await getLakeOptions();
+
+
+    bool result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text('Select Lakes'),
+          children: [
+            SingleChildScrollView(
+              child: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return Column(
+                children: lakeChoices.map((lake) {
+                  return CheckboxListTile(
+                    title: Text(lake),
+                    value: selectedLakes.contains(lake),
+                    onChanged: (value) {
+                      setState(() {
+                        if (value!) {
+                          selectedLakes.add(lake);
+                        } else {
+                          selectedLakes.remove(lake);
+                        }
+                      });
+                    },
+                  );
+                }).toList(),
+              );
+                },
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Text('Done'),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result != null && result) {
+      print('Selected Lakes: $selectedLakes');
+    }
+
+    
+  }
   
   DateTime currentDate = DateTime.now(); // using DateTime class to grab current date, which can be modified in the DatePicker below for filtering purposes
   DateTime actualDate = DateTime.now();
@@ -246,7 +321,7 @@ Widget build(BuildContext context) {
             ),
 
             
-            pickedFile != null ? // two containers, ternary operator 
+            pickedFile != null ? // two containers can be put into 1 with the ternary operator inside
               Container(
                   width: MediaQuery.of(context).size.width * 0.8,
                   child: Card(
@@ -318,7 +393,7 @@ Widget build(BuildContext context) {
                           ]
                         ), 
                         onPressed: () {
-                           
+                           openLakeOptions();
                         } 
                       ),
                     ],
