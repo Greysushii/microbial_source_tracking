@@ -246,7 +246,7 @@ Widget build(BuildContext context) {
             ),
 
             
-            pickedFile != null ? 
+            pickedFile != null ? // two containers, ternary operator 
               Container(
                   width: MediaQuery.of(context).size.width * 0.8,
                   child: Card(
@@ -282,9 +282,14 @@ Widget build(BuildContext context) {
                   child: Row(
                     children: [
                       TextButton(
-                        child: const Text(
-                          "Select Date", 
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
+                        child: const Row( 
+                          children: [ 
+                            Icon(Icons.date_range), 
+                            Text(
+                              "Select Date", 
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)
+                            )
+                          ]
                         ),
                         onPressed: () async {
                           DateTime? pickedDate = await showDatePicker(
@@ -305,7 +310,17 @@ Widget build(BuildContext context) {
                           }
                         },
                       ),
-                      Icon(Icons.date_range),
+                      TextButton( 
+                        child: const Row( 
+                          children: [ 
+                            Icon(Icons.location_on),
+                            Text("Select Location"), 
+                          ]
+                        ), 
+                        onPressed: () {
+                           
+                        } 
+                      ),
                     ],
                   ),
                 ),
@@ -317,12 +332,13 @@ Widget build(BuildContext context) {
                     });
                   },
                 ),
-              ],
+              ],   
             ),
-            Text( 
-              showAllDocuments ? 'All History' : 'History From: ${DateFormat('MM-dd-yyyy').format(currentDate)}', 
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
-            ),
+              Text( 
+                showAllDocuments ? 'All History' : 'History From: ${DateFormat('MM-dd-yyyy').format(currentDate)}', 
+                style: TextStyle(fontSize: 18)
+              ),
+            
             StreamBuilder<QuerySnapshot>(
               stream: getDocumentStream(),
               builder: (context, snapshot) {
