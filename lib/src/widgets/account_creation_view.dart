@@ -4,7 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:microbial_source_tracking/src/home/home_view.dart';
+//import 'package:firebase_storage/firebase_storage.dart';
 
 FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -59,6 +60,8 @@ class RegisterState extends State<RegisterAccount> {
   Future<void> alertMessage(int issue) async {
     String issueTitle = " ";
     String issueContent = " ";
+    String textForButton = "Return";
+
     switch (issue) {
       case 0:
         issueTitle = "Default error";
@@ -85,6 +88,7 @@ class RegisterState extends State<RegisterAccount> {
       case 5:
         issueTitle = "Success";
         issueContent = "Welcome to our app!";
+        textForButton = "Home page";
         break;
     }
 
@@ -97,10 +101,17 @@ class RegisterState extends State<RegisterAccount> {
           content: Text(issueContent, style: TextStyle(fontSize: 16)),
           actions: <Widget>[
             TextButton(
-              child: const Text('Approve'),
               onPressed: () {
-                Navigator.of(context).pop();
+                if (issue == 5) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomeView()),
+                  );
+                } else {
+                  Navigator.of(context).pop();
+                }
               },
+              child: Text(textForButton, style: TextStyle(fontSize: 20)),
             ),
           ],
         );
@@ -110,6 +121,7 @@ class RegisterState extends State<RegisterAccount> {
 
   Future<void> registerUser() async {
     try {
+      // ignore: unused_local_variable
       final UserCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: userEmail.text,
@@ -119,9 +131,7 @@ class RegisterState extends State<RegisterAccount> {
       switch (e.code) {
         case 'email-already-in-use':
           uniqueEmail = false;
-        //emailCheckAndStore();
-        //alertMessage(4);
-        //throw FirebaseAuthException('This email already exists');
+          break;
         case "invalid-email":
           uniqueEmail = false;
           break;
@@ -135,8 +145,14 @@ class RegisterState extends State<RegisterAccount> {
     emailCheckAndStore();
   }
 
-//
-
+/*Add the user into the user collections in Firebase. This is called after the 
+  registerUser() function, regardless of the email being valid. This is due to
+  the "check" in the name, as if the email is in use or poorly formated, it will
+  pass uniqueEmail = false, giving the email error message (4). Otherwise, as 
+  all the other checks prior (password strength, etc.) are checked and the email
+  is valid, add their information into the DB, show registration success alert,
+  then move them to the home page.
+*/
   Future<void> emailCheckAndStore() async {
     switch (uniqueEmail) {
       case (true):
@@ -152,13 +168,6 @@ class RegisterState extends State<RegisterAccount> {
         break;
     }
   }
-/*
-    //Add the user into the user collections in Firebase
-    FirebaseFirestore.instance.collection('users').add({
-      'first name': userFirstName.text.trim(),
-      'last name': userLastName.text.trim(),
-      'email': userEmail.text.trim(),
-    });*/
 
   @override
   Widget build(BuildContext context) {
@@ -339,15 +348,11 @@ class RegisterState extends State<RegisterAccount> {
                       return null;
                     }
                     if (userPass.text != userPassConfirm.text) {
-                      if (kDebugMode) {
-                        //print("\tBAD CONFIRM");
-                      }
+                      if (kDebugMode) {}
                       passConfirm = false;
                     }
                     if (userPass.text == userPassConfirm.text) {
-                      if (kDebugMode) {
-                        //print("\tgood confirm");
-                      }
+                      if (kDebugMode) {}
                       passConfirm = true;
                     }
                     return null;
@@ -366,7 +371,7 @@ class RegisterState extends State<RegisterAccount> {
                     //Check if the values are the same, and if the boxes are not empty
                     if (kDebugMode) {
                       print("Strength $passStrength \nConfirm $passConfirm \n");
-                    } //Unique email $uniqueEmail\n
+                    }
                     //User entered nothing
                     if (((checkButton()) == false)) {
                       alertMessage(1);
