@@ -7,6 +7,7 @@ import 'package:microbial_source_tracking/src/home/home_list_view.dart';
 import 'package:microbial_source_tracking/src/navbar/nav_bar.dart';
 import 'package:microbial_source_tracking/src/navbar/nav_model.dart';
 import 'package:microbial_source_tracking/src/settings/settings_view.dart';
+import 'package:microbial_source_tracking/src/widgets/ssh_controller.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -35,7 +36,7 @@ class _HomeListViewState extends State<HomeView> {
         navBarKey: homeNavKey,
       ),
       NavModel(
-        page: const ConfigView(),
+        page: ConfigView(),
         navBarKey: configNavKey,
       ),
       NavModel(
@@ -82,7 +83,7 @@ class _HomeListViewState extends State<HomeView> {
           child: FloatingActionButton(
             backgroundColor: Colors.white,
             elevation: 0,
-            onPressed: () => debugPrint("Add Button pressed"),
+            onPressed: () => const TestSSH(),
             shape: RoundedRectangleBorder(
               side: const BorderSide(width: 3, color: Colors.lightBlue),
               borderRadius: BorderRadius.circular(100),

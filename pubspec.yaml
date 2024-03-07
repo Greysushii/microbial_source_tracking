@@ -15,6 +15,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_blue_plus: ^1.31.13
+  get: ^4.6.5
   flutter_localizations:
     sdk: flutter
   flutter_svg: ^2.0.9
@@ -24,6 +25,7 @@ dependencies:
 
 
   flutter_gen: any
+  dartssh2: ^2.8.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

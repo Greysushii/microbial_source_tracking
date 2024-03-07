@@ -9,6 +9,7 @@ class bluetoothList extends StatelessWidget {
 
   final List<String> devices;
 
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -24,12 +25,12 @@ class bluetoothList extends StatelessWidget {
             child: ListTile(
               title: Text('Bluetooth ${devices[index]}'),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const NextPage(),
-                  ),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => const NextPage(),
+                //   ),
+                // );
               },
             ),
           );
@@ -39,20 +40,18 @@ class bluetoothList extends StatelessWidget {
   }
 }
 
+
 class NextPage extends StatelessWidget {
-  const NextPage({super.key});
+  const NextPage({
+      super.key,
+      });
+
+
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Device Settings'),
-        ),
-        body: const Center(
-          child: Text('Test Settings'),
-        ),
-      ),
+      
     );
   }
 }

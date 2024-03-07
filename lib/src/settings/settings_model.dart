@@ -33,32 +33,4 @@ final List<Setting> settings = [
     route: '/',
     icon: Icons.handshake,
   ),
-  // Setting(
-  //   title: 'Log Out',
-  //   route: '/',
-  //   icon: Icons.exit_to_app,
-  // ),
 ];
-
-// final List<Setting> settings2 = [
-//   Setting(
-//     title: 'FAQ',
-//     route: '/',
-//     icon: Icons.question_mark,
-//   ),
-//   Setting(
-//     title: 'Contact Us',
-//     route: '/',
-//     icon: Icons.phone,
-//   ),
-//   Setting(
-//     title: 'Help Us',
-//     route: '/',
-//     icon: Icons.handshake,
-//   ),
-//   Setting(
-//     title: 'Log Out',
-//     route: '/',
-//     icon: Icons.exit_to_app,
-//   ),
-// ];

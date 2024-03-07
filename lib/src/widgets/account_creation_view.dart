@@ -122,7 +122,7 @@ AlertDialog passNotMatch = const AlertDialog(
 //condensing the code
 AlertDialog passRegistration = const AlertDialog(
   title: Text("Success!"),
-  content: Text("An email will be sent to the given email address."),
+  content: Text("An Email has been set for verification."),
 );
 
 //Below this line is alllllllllllll the visual stuff!
