@@ -1,6 +1,7 @@
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:microbial_source_tracking/src/home/home_view.dart';
+// import 'package:microbial_source_tracking/src/home/home_view.dart';
 import 'package:microbial_source_tracking/src/widgets/account_creation_view.dart';
 import 'package:microbial_source_tracking/src/widgets/login_controller.dart';
 
@@ -33,7 +34,7 @@ class LoginView extends StatelessWidget {
                   const SizedBox(height: 15),
 
                   // Login widget
-                  const Login(),
+                  Login(),
 
                   const SizedBox(height: 10),
                   Padding(
@@ -49,29 +50,6 @@ class LoginView extends StatelessWidget {
                         ]),
                   ),
                   const SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: ((context) => const HomeView())));
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      margin: const EdgeInsets.symmetric(horizontal: 30),
-                      decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 52, 52, 52),
-                          borderRadius: BorderRadius.circular(8)),
-                      child: const Center(
-                          child: Text(
-                        'Sign in',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )),
-                    ),
-                  ),
                 ],
               )),
         ),
