@@ -61,7 +61,7 @@ Future<void> registerUser() async {
         .set({
       'firstname': userFirstName.text.trim(),
       'lastname': userLastName.text.trim(),
-      'email': userEmail.text.trim(),
+      'email': userEmail.text.trim().toLowerCase(), // has to be lowercase to match logged-in user's email with db query for saving user info as image metadata
     });
   } on FirebaseAuthException catch (e) {
     if (e.code == 'weak-password') {
