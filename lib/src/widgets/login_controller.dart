@@ -1,5 +1,9 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:microbial_source_tracking/src/home/home_view.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -25,6 +29,16 @@ class _LoginState extends State<Login> {
         });
       }
     }
+    if (wrongCredentials == true) {
+      if (kDebugMode) print(':(');
+    } else {
+      if (kDebugMode) print('You in!!');
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomeView()),
+      );
+    }
+    wrongCredentials = false;
   }
 
   @override
@@ -65,7 +79,8 @@ class _LoginState extends State<Login> {
               ),
               child: TextFormField(
                 controller: passwordController,
-                decoration: const InputDecoration(
+                obscureText: passVisible,
+                decoration: InputDecoration(
                   enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
                   focusedBorder: OutlineInputBorder(
@@ -73,8 +88,21 @@ class _LoginState extends State<Login> {
                   fillColor: Colors.white,
                   filled: true,
                   hintText: "Enter password here...",
+                  //Show/hide contents of "Confirm password"
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                        passVisible ? Icons.visibility_off : Icons.visibility),
+                    onPressed: () {
+                      setState(
+                        () {
+                          //Toggle to show the contents of "Enter password"
+                          passVisible = !passVisible;
+                        },
+                      );
+                    },
+                  ),
                 ),
-                obscureText: true,
+                //obscureText: true,
               ),
             ),
             const SizedBox(height: 10),
@@ -83,12 +111,11 @@ class _LoginState extends State<Login> {
             if (wrongCredentials)
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text('Incorrect username or password',
-                          style: TextStyle(color: Colors.red))
-                    ]),
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                  Text('Incorrect username or password',
+                      style: TextStyle(color: Colors.red, fontSize: 17))
+                ]),
               ),
 
             const SizedBox(height: 10),
@@ -106,7 +133,7 @@ class _LoginState extends State<Login> {
                     child: Text(
                   'Sign in',
                   style: TextStyle(
-                    fontSize: 17,
+                    fontSize: 20,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
@@ -119,3 +146,5 @@ class _LoginState extends State<Login> {
     );
   }
 }
+
+bool passVisible = true;
