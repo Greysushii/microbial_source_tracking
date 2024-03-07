@@ -20,12 +20,12 @@ final List<Setting> settings = [
     route: const AccountData(),
     icon: Icons.person_4,
   ),
-  Setting(
+  /* Setting(
     title: 'FAQ',
     route: const FAQpage(),
     icon: Icons.question_mark,
   ),
-  /* Setting(
+   Setting(
     title: 'Contact Us',
     route: AccountData(),
     icon: Icons.phone,

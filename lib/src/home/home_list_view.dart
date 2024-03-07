@@ -36,7 +36,7 @@ class _HomeListViewState extends State<HomeListView> {
     return Scaffold(
         appBar: AppBar(
           title: const Text("Home Page"),
-          backgroundColor: glwaTheme.secondaryHeaderColor,
+          // backgroundColor: glwaTheme.secondaryHeaderColor,
         ),
         body: SafeArea(
           child: Column(
