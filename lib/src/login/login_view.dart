@@ -5,6 +5,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:microbial_source_tracking/src/widgets/account_creation_view.dart';
 import 'package:microbial_source_tracking/src/widgets/login_controller.dart';
 
+TextEditingController emailForgotPassword = TextEditingController();
+
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
 
@@ -28,7 +30,7 @@ class LoginView extends StatelessWidget {
                     'Log in to your account',
                     style: TextStyle(
                         color: Colors.black,
-                        fontSize: 16,
+                        fontSize: 20,
                         fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(height: 15),
@@ -36,7 +38,7 @@ class LoginView extends StatelessWidget {
                   // Login widget
                   Login(),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Row(
@@ -45,31 +47,12 @@ class LoginView extends StatelessWidget {
                           InkWell(
                             onTap: () {},
                             child: const Text('Forgot password?',
-                                style: TextStyle(color: Colors.black)),
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 20)),
                           )
                         ]),
                   ),
                   const SizedBox(height: 10),
-
-                  // // Sign in button
-                  // GestureDetector(
-                  //   onTap: signUserIn,
-                  //   child: Container(
-                  //     padding: const EdgeInsets.all(20),
-                  //     margin: const EdgeInsets.symmetric(horizontal: 30),
-                  //     decoration: BoxDecoration(
-                  //         color: const Color.fromARGB(255, 52, 52, 52),
-                  //         borderRadius: BorderRadius.circular(8)),
-                  //     child: const Center(
-                  //         child: Text(
-                  //       'Sign in',
-                  //       style: TextStyle(
-                  //         color: Colors.white,
-                  //         fontWeight: FontWeight.bold,
-                  //       ),
-                  //     )),
-                  //   ),
-                  // ),
                 ],
               )),
         ),
@@ -78,7 +61,8 @@ class LoginView extends StatelessWidget {
         height: 50,
         alignment: Alignment.topCenter,
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          const Text('Don\'t have an account? '),
+          const Text('Don\'t have an account? ',
+              style: TextStyle(fontSize: 20)),
           InkWell(
             onTap: () {
               Navigator.push(
@@ -90,7 +74,10 @@ class LoginView extends StatelessWidget {
             },
             child: const Text(
               'Sign up here',
-              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20),
             ),
           )
         ]),

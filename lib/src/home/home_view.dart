@@ -8,6 +8,7 @@ import 'package:microbial_source_tracking/src/navbar/nav_bar.dart';
 import 'package:microbial_source_tracking/src/navbar/nav_model.dart';
 import 'package:microbial_source_tracking/src/settings/settings_view.dart';
 import 'package:microbial_source_tracking/src/widgets/ssh_controller.dart';
+import 'package:microbial_source_tracking/src/widgets/test_config.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -83,7 +84,10 @@ class _HomeListViewState extends State<HomeView> {
           child: FloatingActionButton(
             backgroundColor: Colors.white,
             elevation: 0,
-            onPressed: () => const TestSSH(),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const TestConfig()));
+            },
             shape: RoundedRectangleBorder(
               side: const BorderSide(width: 3, color: Colors.lightBlue),
               borderRadius: BorderRadius.circular(100),
