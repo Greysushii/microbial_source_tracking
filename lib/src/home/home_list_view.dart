@@ -209,6 +209,7 @@ class _HomeListViewState extends State<HomeListView> {
             const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text('Most Recent Experimental Data',
+                child: Text('Most Recent Experimental Data',
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 17))),
             Expanded(
