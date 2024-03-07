@@ -49,12 +49,13 @@ class _HistoryPageState extends State<HistoryPage> {
       String? waterSource = await getWaterSource();
 
       if (waterSource != null) {
+        
         final ref = FirebaseStorage.instance.ref().child(path);
         TaskSnapshot firebaseStorageUpload = await ref.putFile(file); // waiting for FB storage upload to complete before grabbing URL
 
         String currentUserEmail = FirebaseAuth.instance.currentUser?.email ?? "";
 
-        QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('users').where('email', isEqualTo: currentUserEmail).get(); //it wasnt working bc CASE SENSITIVE im actually sad lmfao
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('users').where('email', isEqualTo: currentUserEmail).get();
         
         DocumentSnapshot currentUserInfo = querySnapshot.docs.first;
 
@@ -321,7 +322,7 @@ Widget build(BuildContext context) {
             ),
 
             
-            pickedFile != null ? // two containers can be put into 1 with the ternary operator inside
+            pickedFile != null ?
               Container(
                   width: MediaQuery.of(context).size.width * 0.8,
                   child: Card(
