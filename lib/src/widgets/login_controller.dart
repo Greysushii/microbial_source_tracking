@@ -1,7 +1,9 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:microbial_source_tracking/src/home/home_view.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -27,6 +29,16 @@ class _LoginState extends State<Login> {
         });
       }
     }
+    if (wrongCredentials == true) {
+      if (kDebugMode) print(':(');
+    } else {
+      if (kDebugMode) print('You in!!');
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomeView()),
+      );
+    }
+    wrongCredentials = false;
   }
 
   @override

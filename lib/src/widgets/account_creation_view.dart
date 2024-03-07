@@ -107,6 +107,7 @@ class RegisterState extends State<RegisterAccount> {
                     context,
                     MaterialPageRoute(builder: (context) => HomeView()),
                   );
+                  //Navigator.of(context).pop();
                 } else {
                   Navigator.of(context).pop();
                 }
@@ -142,6 +143,8 @@ class RegisterState extends State<RegisterAccount> {
         print(e);
       }
     }
+
+    //sendLink();
     emailCheckAndStore();
   }
 
@@ -444,13 +447,31 @@ class RegisterState extends State<RegisterAccount> {
     return _em.isEmpty;
   }
 
-//Email the user their verification code
-  var constructEmail = ActionCodeSettings(
-    url: 'glwa-app.firebaseapp.com',
-    handleCodeInApp: true,
-    iOSBundleId: 'com.example.ios',
-    androidPackageName: 'com.example.android',
-  );
+  var acs = ActionCodeSettings(
+      // URL you want to redirect back to. The domain (www.example.com) for this
+      // URL must be whitelisted in the Firebase Console.
+      url: 'glwa-app.web.app',
+      // This must be true
+      handleCodeInApp: true,
+      iOSBundleId: 'com.example.ios',
+      androidPackageName: 'com.example.android',
+      // installIfNotAvailable
+      androidInstallApp: true,
+      // minimumVersion
+      androidMinimumVersion: '12');
+  void sendLink() {
+    FirebaseAuth.instance.sendSignInLinkToEmail(
+        email: userEmail.text
+        // ignore: avoid_print
+        ,
+        actionCodeSettings: acs);
+  }
+
+/*var emailAuth = 'someemail@domain.com';
+FirebaseAuth.instance.sendSignInLinkToEmail(
+        email: emailAuth, actionCodeSettings: acs)
+    .catchError((onError) => print('Error sending email verification $onError'))
+    .then((value) => print('Successfully sent email verification'));*/
 
 //Dialog box for passwords not matching
   AlertDialog passNotMatch = const AlertDialog(

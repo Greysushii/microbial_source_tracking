@@ -5,6 +5,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:microbial_source_tracking/src/widgets/account_creation_view.dart';
 import 'package:microbial_source_tracking/src/widgets/login_controller.dart';
 
+TextEditingController emailForgotPassword = TextEditingController();
+
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
 
