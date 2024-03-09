@@ -160,9 +160,9 @@ class RegisterState extends State<RegisterAccount> {
     switch (uniqueEmail) {
       case (true):
         FirebaseFirestore.instance.collection('users').add({
-          'first name': userFirstName.text.trim(),
-          'last name': userLastName.text.trim(),
-          'email': userEmail.text.trim(),
+          'firstname': userFirstName.text.trim(),
+          'lastname': userLastName.text.trim(),
+          'email': userEmail.text.trim().toLowerCase()
         });
         alertMessage(5);
         break;
