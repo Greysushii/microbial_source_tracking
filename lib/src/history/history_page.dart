@@ -43,6 +43,8 @@ class _HistoryPageState extends State<HistoryPage> {
     var locationPermissionStatus = await Permission.location.request();
 
     if (locationPermissionStatus == PermissionStatus.granted) {
+      
+
       final path = 'images/${pickedFile!.name}';
       final file = File(pickedFile!.path!);
 
@@ -85,8 +87,6 @@ class _HistoryPageState extends State<HistoryPage> {
         });
         
 
-        
-
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('File Uploaded!'),
@@ -112,6 +112,13 @@ class _HistoryPageState extends State<HistoryPage> {
             TextButton(
               child: Text('Done'),
               onPressed: () {
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                  content: Text('Accessing User Location...'),
+                  ),
+                );
+
                 Navigator.pop(context, waterSourceController.text);
               }
             ),
@@ -162,6 +169,7 @@ class _HistoryPageState extends State<HistoryPage> {
     
   }
 
+
   Future showSelectedFile() async {
     if (pickedFile != null) {
       File file = File(pickedFile!.path!);
@@ -187,9 +195,9 @@ class _HistoryPageState extends State<HistoryPage> {
 
   }
 
+  List<String> selectedLakes = [];
+
   Future openLakeOptions() async {
-    
-    List<String> selectedLakes = [];
 
     List<String> lakeChoices = await getLakeOptions();
 
@@ -227,16 +235,17 @@ class _HistoryPageState extends State<HistoryPage> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
+                  child: Text('Cancel'),
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
-                  child: Text('Cancel'),
                 ),
                 TextButton(
+                  child: Text('Done'),
                   onPressed: () {
                     Navigator.of(context).pop(true);
+                    setState(() {});
                   },
-                  child: Text('Done'),
                 ),
               ],
             ),
@@ -257,23 +266,31 @@ class _HistoryPageState extends State<HistoryPage> {
 
   bool showAllDocuments = true;
   
-  Stream<QuerySnapshot> getDocumentStream() { // function for filtering documents based on the user's preferred date range then building stream
 
-    if (showAllDocuments == true) {
-      return FirebaseFirestore.instance.collection("images").orderBy('uploadedDate', descending: true).snapshots();
-    }
-
-    else {
-
-    
-      DateTime start = DateTime(currentDate.year, currentDate.month, currentDate.day); // define start of range for filtering documents by date
-      DateTime end = start.add(Duration(days: 1)); // define end of range for document filtering by date
-
-      return FirebaseFirestore.instance.collection('images').where('uploadedDate', isGreaterThanOrEqualTo: start).where('uploadedDate', isLessThan: end).orderBy('uploadedDate', descending: true).snapshots();
-      // returning docs fitting the desired date range
   
-    }
+  Stream<QuerySnapshot> getDocumentStream() {
+  DateTime start = DateTime(currentDate.year, currentDate.month, currentDate.day);
+  DateTime end = start.add(Duration(days: 1));
+
+  Query collectionQuery = FirebaseFirestore.instance.collection('images');
+  
+  if (!showAllDocuments) {
+    collectionQuery = collectionQuery.where('uploadedDate', isGreaterThanOrEqualTo: start).where('uploadedDate', isLessThan: end);
   }
+
+  if (selectedLakes.isNotEmpty) {
+    collectionQuery = collectionQuery.where('lake', whereIn: selectedLakes);
+  }
+
+  collectionQuery = collectionQuery.orderBy('uploadedDate', descending: true);
+
+  return collectionQuery.snapshots();
+}
+
+
+
+
+
 
   @override
 Widget build(BuildContext context) {
@@ -421,7 +438,7 @@ Widget build(BuildContext context) {
                 List<QueryDocumentSnapshot> documents = snapshot.data?.docs ?? [];
 
                 if (documents.isEmpty) {
-                  return Text('No files found.');
+                  return Text('No files found with current filters.');
                 }
 
                 return Column(

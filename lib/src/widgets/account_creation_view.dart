@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/utils.dart';
 import 'package:microbial_source_tracking/src/home/home_view.dart';
 //import 'package:firebase_storage/firebase_storage.dart';
 
@@ -128,6 +129,15 @@ class RegisterState extends State<RegisterAccount> {
         email: userEmail.text,
         password: userPass.text,
       );
+
+      // FirebaseFirestore.instance.collection('users').doc(UserCredential.user!.uid).set(
+      //   {
+      //     'firstname': userFirstName.text.trim(),
+      //     'lastname': userLastName.text.trim(),
+      //     'email': userEmail.text.trim().toLowerCase(),
+      //   }
+      // );
+
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'email-already-in-use':
@@ -145,7 +155,7 @@ class RegisterState extends State<RegisterAccount> {
     }
 
     //sendLink();
-    emailCheckAndStore();
+    // emailCheckAndStore();
   }
 
 /*Add the user into the user collections in Firebase. This is called after the 
@@ -160,9 +170,9 @@ class RegisterState extends State<RegisterAccount> {
     switch (uniqueEmail) {
       case (true):
         FirebaseFirestore.instance.collection('users').add({
-          'first name': userFirstName.text.trim(),
-          'last name': userLastName.text.trim(),
-          'email': userEmail.text.trim(),
+          'firstname': userFirstName.text.trim(),
+          'lastname': userLastName.text.trim(),
+          'email': userEmail.text.trim().toLowerCase(), //must be lowercase to save user info
         });
         alertMessage(5);
         break;

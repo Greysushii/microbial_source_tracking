@@ -38,7 +38,7 @@ class _HomeListViewState extends State<HomeListView> {
           title: const Text("Home Page"),
           // backgroundColor: glwaTheme.secondaryHeaderColor,
         ),
-        body: SafeArea(
+        body: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [

@@ -7,7 +7,6 @@ import 'package:microbial_source_tracking/src/home/home_list_view.dart';
 import 'package:microbial_source_tracking/src/navbar/nav_bar.dart';
 import 'package:microbial_source_tracking/src/navbar/nav_model.dart';
 import 'package:microbial_source_tracking/src/settings/settings_view.dart';
-import 'package:microbial_source_tracking/src/widgets/ssh_controller.dart';
 import 'package:microbial_source_tracking/src/widgets/test_config.dart';
 
 class HomeView extends StatefulWidget {

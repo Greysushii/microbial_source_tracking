@@ -20,7 +20,7 @@ dependencies:
     sdk: flutter
   flutter_svg: ^2.0.9
   image_picker: ^1.0.7 # this enables accessing local storage 
-  file_picker: ^4.5.1 # this too but for files not just images 
+  file_picker: ^5.1.0 # this too but for files not just images 
   firebase_storage: 11.6.0
   intl: ^0.18.0
   geolocator: ^8.0.0 # get phone location 

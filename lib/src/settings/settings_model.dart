@@ -20,19 +20,4 @@ final List<Setting> settings = [
     route: const AccountData(),
     icon: Icons.person_4,
   ),
-  /* Setting(
-    title: 'FAQ',
-    route: const FAQpage(),
-    icon: Icons.question_mark,
-  ),
-   Setting(
-    title: 'Contact Us',
-    route: AccountData(),
-    icon: Icons.phone,
-  ),
-   Setting(
-    title: 'Help Us',
-    route: AccountData(),
-    icon: Icons.handshake,
-  ),
 ];
