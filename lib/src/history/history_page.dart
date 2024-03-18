@@ -1,9 +1,15 @@
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -17,6 +23,9 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
+
+  final db = FirebaseFirestore.instance; // Cloud firestore instance! 
+
 
   final db = FirebaseFirestore.instance; // Cloud firestore instance! 
 
@@ -35,7 +44,16 @@ class _HistoryPageState extends State<HistoryPage> {
       
    });
   
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('File Selected!'),
+        ),
+      );
+      
+   });
+  
   }
+
 
 
   Future uploadFile() async {
@@ -595,4 +613,5 @@ Widget build(BuildContext context) {
 }
 
 }
+// search bar: search by date, location, and person who took the data. Nothing else is needed
 // search bar: search by date, location, and person who took the data. Nothing else is needed
