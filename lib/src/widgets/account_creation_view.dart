@@ -172,7 +172,7 @@ class RegisterState extends State<RegisterAccount> {
         FirebaseFirestore.instance.collection('users').add({
           'firstname': userFirstName.text.trim(),
           'lastname': userLastName.text.trim(),
-          'email': userEmail.text.trim().toLowerCase(), //must be lowercase to save user info
+          'email': userEmail.text.trim().toLowerCase(),
         });
         alertMessage(5);
         break;
