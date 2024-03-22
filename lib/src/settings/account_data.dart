@@ -12,6 +12,7 @@ class AccountData extends StatefulWidget {
 class _AccountDataState extends State<AccountData> {
   final user = FirebaseAuth.instance.currentUser!;
   TextEditingController newValue = TextEditingController();
+  bool saveDisabled = true;
 
   @override
   void dispose() {
@@ -109,11 +110,21 @@ class _AccountDataState extends State<AccountData> {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text('Change email'),
-                        content: TextField(
+                        content: TextFormField(
                           autofocus: true,
                           decoration: const InputDecoration(
                               hintText: 'Enter new email'),
                           controller: newValue,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (text) {
+                            if (text == null || text.isEmpty) {
+                              return "Please enter an email";
+                            }
+                            if (!text.contains('@')) {
+                              return "Please enter a valid email";
+                            }
+                            return null;
+                          },
                         ),
                         actions: [
                           TextButton(
@@ -145,11 +156,19 @@ class _AccountDataState extends State<AccountData> {
                             context: context,
                             builder: (context) => AlertDialog(
                               title: const Text('Change first name'),
-                              content: TextField(
+                              content: TextFormField(
                                 autofocus: true,
                                 decoration: const InputDecoration(
                                     hintText: 'Enter new name'),
                                 controller: newValue,
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                validator: (text) {
+                                  if (text == null || text.isEmpty) {
+                                    return "Please enter a name";
+                                  }
+                                  return null;
+                                },
                               ),
                               actions: [
                                 TextButton(
@@ -179,11 +198,19 @@ class _AccountDataState extends State<AccountData> {
                             context: context,
                             builder: (context) => AlertDialog(
                               title: const Text('Change last name'),
-                              content: TextField(
+                              content: TextFormField(
                                 autofocus: true,
                                 decoration: const InputDecoration(
                                     hintText: 'Enter new name'),
                                 controller: newValue,
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                validator: (text) {
+                                  if (text == null || text.isEmpty) {
+                                    return "Please enter a name";
+                                  }
+                                  return null;
+                                },
                               ),
                               actions: [
                                 TextButton(
