@@ -917,7 +917,7 @@ SPEC CHECKSUMS:
   cloud_firestore: 204a2db57e7249e0cbbeee32d510580280b13016
   DKImagePickerController: b512c28220a2b8ac7419f21c491fc8534b7601ac
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
-  file_picker: 817ab1d8cd2da9d2da412a417162deee3500fc95
+  file_picker: ce3938a0df3cc1ef404671531facef740d03f920
   Firebase: 797fd7297b7e1be954432743a0b3f90038e45a71
   firebase_auth: 1c6eaddc11fba7540c64102d6d9688a58cdbf7df
   firebase_core: 8e100adc478919c6f3224f854ce8fa0bd98e36fd
@@ -949,6 +949,6 @@ SPEC CHECKSUMS:
   SDWebImage: 981fd7e860af070920f249fd092420006014c3eb
   SwiftyGif: 93a1cc87bf3a51916001cf8f3d63835fb64c819f
 
-PODFILE CHECKSUM: 87f02e05e833fbe3b4bdc3e782dd697e66768418
+PODFILE CHECKSUM: 0e7183fcd0128871e6c9134f0e034d4dcedebd33
 
 COCOAPODS: 1.15.0

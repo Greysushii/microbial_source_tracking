@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:microbial_source_tracking/src/settings/account_data.dart';
-import 'package:microbial_source_tracking/src/settings/faq_page.dart';
 
 class Setting {
   final String title;

@@ -25,6 +25,7 @@ dependencies:
   intl: ^0.18.0
   geolocator: ^8.0.0 # get phone location 
   permission_handler: ^11.3.0 # handles permission for accessing phone location
+  http: ^0.13.3
 
 
 

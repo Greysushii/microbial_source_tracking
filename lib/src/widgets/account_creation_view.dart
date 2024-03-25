@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:get/utils.dart';
 import 'package:microbial_source_tracking/src/home/home_view.dart';
 //import 'package:firebase_storage/firebase_storage.dart';
 
@@ -130,13 +129,13 @@ class RegisterState extends State<RegisterAccount> {
         password: userPass.text,
       );
 
-      // FirebaseFirestore.instance.collection('users').doc(UserCredential.user!.uid).set(
-      //   {
-      //     'firstname': userFirstName.text.trim(),
-      //     'lastname': userLastName.text.trim(),
-      //     'email': userEmail.text.trim().toLowerCase(),
-      //   }
-      // );
+      FirebaseFirestore.instance.collection('users').doc(UserCredential.user!.uid).set(
+        {
+          'firstname': userFirstName.text.trim(),
+          'lastname': userLastName.text.trim(),
+          'email': userEmail.text.trim().toLowerCase(),
+        }
+      );
 
     } on FirebaseAuthException catch (e) {
       switch (e.code) {

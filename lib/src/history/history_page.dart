@@ -265,6 +265,7 @@ class _HistoryPageState extends State<HistoryPage> {
         },
       );
 
+      // ignore: unnecessary_null_comparison
       if (result != null && result) {
         print('Selected Users: $selectedUsers');
       }
@@ -329,6 +330,7 @@ class _HistoryPageState extends State<HistoryPage> {
         },
       );
 
+      // ignore: unnecessary_null_comparison
       if (result != null && result) {
         print('Selected Lakes: $selectedLakes');
       }
@@ -419,7 +421,7 @@ Widget build(BuildContext context) {
                     child: ListTile(
                         title: Text(
                           'Selected file: ${pickedFile!.name}', 
-                           textAlign: TextAlign.center),
+                          textAlign: TextAlign.center),
                         onTap: () {
                           showSelectedFile(); 
                         },
@@ -487,7 +489,7 @@ Widget build(BuildContext context) {
                           ]
                         ), 
                         onPressed: () {
-                           openLakeOptions();
+                          openLakeOptions();
                         } 
                       ),
                       TextButton( 
