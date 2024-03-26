@@ -116,11 +116,6 @@ class RegisterState extends State<Register> {
                     context,
                     MaterialPageRoute(builder: (context) => HomeView()),
                   );
-                  /*Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomeView()),
-                  );*/
-                  //Navigator.of(context).pop();
                 } else {
                   Navigator.of(context).pop();
                 }

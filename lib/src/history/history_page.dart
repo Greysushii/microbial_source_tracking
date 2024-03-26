@@ -43,6 +43,8 @@ class _HistoryPageState extends State<HistoryPage> {
     var locationPermissionStatus = await Permission.location.request();
 
     if (locationPermissionStatus == PermissionStatus.granted) {
+      
+
       final path = 'images/${pickedFile!.name}';
       final file = File(pickedFile!.path!);
 
@@ -85,8 +87,6 @@ class _HistoryPageState extends State<HistoryPage> {
         });
         
 
-        
-
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('File Uploaded!'),
@@ -112,6 +112,13 @@ class _HistoryPageState extends State<HistoryPage> {
             TextButton(
               child: Text('Done'),
               onPressed: () {
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                  content: Text('Accessing User Location...'),
+                  ),
+                );
+
                 Navigator.pop(context, waterSourceController.text);
               }
             ),
@@ -162,6 +169,7 @@ class _HistoryPageState extends State<HistoryPage> {
     
   }
 
+
   Future showSelectedFile() async {
     if (pickedFile != null) {
       File file = File(pickedFile!.path!);
@@ -177,105 +185,187 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
-  Future getLakeOptions() async {
+  List<String> selectedLakes = [];
+  List<String> selectedUsers = [];
 
-    QuerySnapshot lakeQuery = await FirebaseFirestore.instance.collection('images').orderBy('lake').get();
+    Future getLakeOptions() async {
 
-    List<String> lakeOptions = lakeQuery.docs.map((doc) => (doc['lake'] as String?) ?? "").toSet().toList();
+      QuerySnapshot lakeQuery = await FirebaseFirestore.instance.collection('images').orderBy('lake').get();
 
-    return lakeOptions;
+      List<String> lakeOptions = lakeQuery.docs.map((doc) => (doc['lake'] as String?) ?? "").toSet().toList();
 
-  }
+      return lakeOptions;
 
-  Future openLakeOptions() async {
-    
-    List<String> selectedLakes = [];
-
-    List<String> lakeChoices = await getLakeOptions();
-
-
-    bool result = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return SimpleDialog(
-          title: Text('Select Lakes'),
-          children: [
-            SingleChildScrollView(
-              child: StatefulBuilder(
-                builder: (BuildContext context, StateSetter setState) {
-                  return Column(
-                children: lakeChoices.map((lake) {
-                  return CheckboxListTile(
-                    title: Text(lake),
-                    value: selectedLakes.contains(lake),
-                    onChanged: (value) {
-                      setState(() {
-                        if (value!) {
-                          selectedLakes.add(lake);
-                        } else {
-                          selectedLakes.remove(lake);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
-              );
-                },
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                  child: Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                  child: Text('Done'),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-
-    if (result != null && result) {
-      print('Selected Lakes: $selectedLakes');
     }
 
-    
-  }
+    Future getUserOptions() async {
+
+      QuerySnapshot userQuery = await FirebaseFirestore.instance.collection('users').orderBy('email').get();
+
+      List<String> userOptions = userQuery.docs.map((doc) => (doc['email'] as String?) ?? "").toSet().toList();
+
+      return userOptions;
+
+    }
+
+    Future openUserOptions() async {
+
+      List<String> userChoices = await getUserOptions();
+
+
+      bool result = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: Text('Select Users'),
+            children: [
+              SingleChildScrollView(
+                child: StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return Column(
+                  children: userChoices.map((user) {
+                    return CheckboxListTile(
+                      title: Text(user),
+                      value: selectedUsers.contains(user),
+                      onChanged: (value) {
+                        setState(() {
+                          if (value!) {
+                            selectedUsers.add(user);
+                          } else {
+                            selectedUsers.remove(user);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                );
+                  },
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    child: Text('Cancel'),
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                  ),
+                  TextButton(
+                    child: Text('Done'),
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                      setState(() {});
+                    },
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      );
+
+      if (result != null && result) {
+        print('Selected Users: $selectedUsers');
+      }
+
+      
+    }
+
+    Future openLakeOptions() async {
+
+      List<String> lakeChoices = await getLakeOptions();
+
+
+      bool result = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: Text('Select Lakes'),
+            children: [
+              SingleChildScrollView(
+                child: StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return Column(
+                  children: lakeChoices.map((lake) {
+                    return CheckboxListTile(
+                      title: Text(lake),
+                      value: selectedLakes.contains(lake),
+                      onChanged: (value) {
+                        setState(() {
+                          if (value!) {
+                            selectedLakes.add(lake);
+                          } else {
+                            selectedLakes.remove(lake);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                );
+                  },
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    child: Text('Cancel'),
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                  ),
+                  TextButton(
+                    child: Text('Done'),
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                      setState(() {});
+                    },
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      );
+
+      if (result != null && result) {
+        print('Selected Lakes: $selectedLakes');
+      }
+
+      
+    }
   
   DateTime currentDate = DateTime.now(); // using DateTime class to grab current date, which can be modified in the DatePicker below for filtering purposes
   DateTime actualDate = DateTime.now();
 
   bool showAllDocuments = true;
   
-  Stream<QuerySnapshot> getDocumentStream() { // function for filtering documents based on the user's preferred date range then building stream
 
-    if (showAllDocuments == true) {
-      return FirebaseFirestore.instance.collection("images").orderBy('uploadedDate', descending: true).snapshots();
-    }
-
-    else {
-
-    
-      DateTime start = DateTime(currentDate.year, currentDate.month, currentDate.day); // define start of range for filtering documents by date
-      DateTime end = start.add(Duration(days: 1)); // define end of range for document filtering by date
-
-      return FirebaseFirestore.instance.collection('images').where('uploadedDate', isGreaterThanOrEqualTo: start).where('uploadedDate', isLessThan: end).orderBy('uploadedDate', descending: true).snapshots();
-      // returning docs fitting the desired date range
   
-    }
+  Stream<QuerySnapshot> getDocumentStream() {
+  DateTime start = DateTime(currentDate.year, currentDate.month, currentDate.day);
+  DateTime end = start.add(Duration(days: 1));
+
+  Query collectionQuery = FirebaseFirestore.instance.collection('images');
+  
+  if (!showAllDocuments) {
+    collectionQuery = collectionQuery.where('uploadedDate', isGreaterThanOrEqualTo: start).where('uploadedDate', isLessThan: end);
   }
 
-  @override
+  if (selectedLakes.isNotEmpty) {
+    collectionQuery = collectionQuery.where('lake', whereIn: selectedLakes);
+  }
+
+  collectionQuery = collectionQuery.orderBy('uploadedDate', descending: true);
+
+  return collectionQuery.snapshots();
+  
+}
+
+
+
+@override
 Widget build(BuildContext context) {
   return Scaffold(
     appBar: AppBar(
@@ -359,12 +449,12 @@ Widget build(BuildContext context) {
                     children: [
                       TextButton(
                         child: const Row( 
-                          children: [ 
-                            Icon(Icons.date_range), 
+                          children: [  
                             Text(
-                              "Select Date", 
+                              "Date ", 
                               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)
-                            )
+                            ),
+                            Icon(Icons.date_range),
                           ]
                         ),
                         onPressed: () async {
@@ -388,13 +478,31 @@ Widget build(BuildContext context) {
                       ),
                       TextButton( 
                         child: const Row( 
-                          children: [ 
-                            Icon(Icons.location_on),
-                            Text("Select Location"), 
+                          children: [
+                            Text(
+                              "Location", 
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)
+                            ),
+                            Icon(Icons.location_on), 
                           ]
                         ), 
                         onPressed: () {
                            openLakeOptions();
+                        } 
+                      ),
+                      TextButton( 
+                        child: const Row( 
+                          children: [ 
+                            Text(
+                              "User", 
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)
+                            ),
+                            Icon(Icons.person),
+                            // Text("Select Location"), 
+                          ]
+                        ), 
+                        onPressed: () {
+                          openUserOptions();
                         } 
                       ),
                     ],
@@ -421,7 +529,7 @@ Widget build(BuildContext context) {
                 List<QueryDocumentSnapshot> documents = snapshot.data?.docs ?? [];
 
                 if (documents.isEmpty) {
-                  return Text('No files found.');
+                  return Text('No files found with current filters.');
                 }
 
                 return Column(

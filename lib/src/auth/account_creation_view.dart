@@ -12,8 +12,8 @@ import 'package:microbial_source_tracking/src/login/login_view.dart';
 import '../widgets/account_creation_controller.dart';
 import '../widgets/login_controller.dart';
 
-//RegisterAccount is the name of this widget,
-//refer to RegisterAccount for routing purposes
+//RegisterView is the name of this widget,
+//refer to RegisterView for routing purposes
 class RegisterView extends StatelessWidget {
   const RegisterView({
     super.key,
