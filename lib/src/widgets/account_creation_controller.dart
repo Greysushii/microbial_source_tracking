@@ -8,7 +8,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:microbial_source_tracking/src/home/home_view.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:microbial_source_tracking/src/widgets/email_verification_page.dart';
 
 FirebaseAuth auth = FirebaseAuth.instance;
 
