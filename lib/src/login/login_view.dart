@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 // import 'package:microbial_source_tracking/src/home/home_view.dart';
-import 'package:microbial_source_tracking/src/widgets/account_creation_view.dart';
+import 'package:microbial_source_tracking/src/auth/account_creation_view.dart';
 import 'package:microbial_source_tracking/src/widgets/login_controller.dart';
 
 TextEditingController emailForgotPassword = TextEditingController();
@@ -68,7 +68,7 @@ class LoginView extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const RegisterAccount(),
+                  builder: (context) => const RegisterView(),
                 ),
               );
             },
