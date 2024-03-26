@@ -134,9 +134,12 @@ class _AccountDataState extends State<AccountData> {
                           ),
                           TextButton(
                             onPressed: () => {
-                              updateEmail(),
-                              updateUser('email'),
-                              clearText(),
+                              if (newValue.text.trim().isNotEmpty)
+                                {
+                                  updateEmail(),
+                                  updateUser('email'),
+                                  clearText()
+                                },
                               Navigator.pop(context)
                             },
                             child: const Text('Save'),
@@ -178,9 +181,9 @@ class _AccountDataState extends State<AccountData> {
                                 ),
                                 TextButton(
                                   onPressed: () => {
-                                    updateUser('firstname'),
-                                    clearText(),
-                                    Navigator.pop(context)
+                                    if (newValue.text.trim().isNotEmpty)
+                                      {updateUser('firstname'), clearText()},
+                                    Navigator.pop(context),
                                   },
                                   child: const Text('Save'),
                                 )
@@ -220,8 +223,8 @@ class _AccountDataState extends State<AccountData> {
                                 ),
                                 TextButton(
                                   onPressed: () => {
-                                    updateUser('lastname'),
-                                    clearText(),
+                                    if (newValue.text.trim().isNotEmpty)
+                                      {updateUser('lastname'), clearText()},
                                     Navigator.pop(context),
                                   },
                                   child: const Text('Save'),
@@ -254,8 +257,8 @@ class _AccountDataState extends State<AccountData> {
                                 ),
                                 TextButton(
                                   onPressed: () => {
-                                    updatePassword(),
-                                    clearText(),
+                                    if (newValue.text.trim().isNotEmpty)
+                                      {updatePassword(), clearText()},
                                     Navigator.pop(context)
                                   },
                                   child: const Text('OK'),
