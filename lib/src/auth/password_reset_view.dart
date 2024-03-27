@@ -1,16 +1,11 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:microbial_source_tracking/src/login/login_view.dart';
-import '../widgets/account_creation_controller.dart';
+import '../widgets/password_reset_controller.dart';
 
-//RegisterView is the name of this widget,
-//refer to RegisterView for routing purposes
-class RegisterView extends StatelessWidget {
-  const RegisterView({
-    super.key,
-  });
+class PasswordResetView extends StatelessWidget {
+  const PasswordResetView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,24 +17,20 @@ class RegisterView extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(8.0),
               child: Column(
-                children: [
-                  const SizedBox(height: 10),
-                  Container(
-                      alignment: Alignment.center,
-                      child: SvgPicture.asset('assets/images/glwa_logo.svg')),
-                  const SizedBox(height: 50),
-                  const Text(
-                    'Create a new account',
+                children: const [
+                  SizedBox(height: 50),
+                  Text(
+                    'Enter your email to send a password reset',
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 20,
                         fontWeight: FontWeight.w500),
                   ),
-                  const SizedBox(height: 15),
+                  SizedBox(height: 15),
 
                   //Register widget
-                  Register(),
-                  const SizedBox(height: 20),
+                  PasswordReset(),
+                  SizedBox(height: 20),
                 ],
               )),
         ),
@@ -48,8 +39,7 @@ class RegisterView extends StatelessWidget {
         height: 50,
         alignment: Alignment.topCenter,
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          const Text('Already have an account? ',
-              style: TextStyle(fontSize: 20)),
+          const Text('', style: TextStyle(fontSize: 20)),
           InkWell(
             onTap: () {
               Navigator.push(

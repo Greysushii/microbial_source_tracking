@@ -5,7 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:microbial_source_tracking/src/auth/account_creation_view.dart';
 import 'package:microbial_source_tracking/src/widgets/login_controller.dart';
 
-TextEditingController emailForgotPassword = TextEditingController();
+import '../auth/password_reset_view.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
@@ -45,7 +45,15 @@ class LoginView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const PasswordResetView(),
+                                ),
+                              );
+                            },
                             child: const Text('Forgot password?',
                                 style: TextStyle(
                                     color: Colors.black, fontSize: 20)),

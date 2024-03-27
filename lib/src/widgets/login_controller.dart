@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:microbial_source_tracking/src/home/home_view.dart';
 
@@ -18,27 +17,60 @@ class _LoginState extends State<Login> {
 
   bool wrongCredentials = false;
 
+/*Nick: I was testing signing in, and was able to do so without even entering
+  a value. The e.codes here are messy, but I just wanted to make sure no error
+  got passed...going to need to clean this up before the final! */
   Future signUserIn() async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: emailController.text, password: passwordController.text);
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'invalid-credential') {
+      if (e.code == 'invalid-email' ||
+          e.code == 'invalid-credential' ||
+          e.code == 'user-not-found' ||
+          e.code == 'wrong-password' ||
+          e.code == 'channel-error' ||
+          emailController.text.isEmpty ||
+          passwordController.text.isEmpty) {
         setState(() {
           wrongCredentials = true;
         });
       }
     }
     if (wrongCredentials == true) {
-      if (kDebugMode) print(':(');
+      alertMessage();
     } else {
-      if (kDebugMode) print('You in!!');
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => HomeView()),
       );
     }
     wrongCredentials = false;
+  }
+
+  Future<void> alertMessage() async {
+    String issueTitle = "Invalid email or password";
+    String issueContent = "Please check your spelling and try again.";
+    String textForButton = "Return";
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(issueTitle, style: TextStyle(fontSize: 24)),
+          content: Text(issueContent, style: TextStyle(fontSize: 20)),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(textForButton, style: TextStyle(fontSize: 20)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override

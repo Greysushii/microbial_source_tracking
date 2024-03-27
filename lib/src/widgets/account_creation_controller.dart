@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:microbial_source_tracking/src/home/home_view.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -51,18 +50,6 @@ class Register extends StatefulWidget {
 class RegisterState extends State<Register> {
   //retrieve text from input
   final myController = TextEditingController();
-
-  /*Future<void> emailCheckAndStore() async {
-    debugPrint("Start of ECAS");
-    switch (uniqueEmail) {
-      case (true):
-        alertMessage(5);
-        break;
-      case (false):
-        alertMessage(4);
-        break;
-    }
-  }*/
 
   Future<void> alertMessage(int issue) async {
     String issueTitle = " ";
@@ -333,16 +320,10 @@ class RegisterState extends State<Register> {
                   return null;
                 }
                 if (strengthRequirements(text) == false) {
-                  if (kDebugMode) {
-                    //print("BAD PASS");
-                  }
                   passStrength = false;
                   return _em;
                 }
                 if (strengthRequirements(text) == true) {
-                  if (kDebugMode) {
-                    //print("good pass");
-                  }
                   passStrength = true;
                 }
                 return null;
