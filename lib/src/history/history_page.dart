@@ -78,10 +78,10 @@ class _HistoryPageState extends State<HistoryPage> {
       // When we reach here, permissions are granted and we can
       // continue accessing the position of the device.
 
-    final path = 'images/${pickedFile!.name}';
-    final file = File(pickedFile!.path!);
+      final path = 'images/${pickedFile!.name}';
+      final file = File(pickedFile!.path!);
 
-    String? waterSource = await getWaterSource();
+      String? waterSource = await getWaterSource();
 
       if (waterSource != null) {
         final ref = FirebaseStorage.instance.ref().child(path);
@@ -413,6 +413,7 @@ class _HistoryPageState extends State<HistoryPage> {
     collectionQuery = collectionQuery.orderBy('uploadedDate', descending: true);
     
     return collectionQuery.snapshots(); 
+    
   }
 
  
