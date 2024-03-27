@@ -128,6 +128,15 @@ class RegisterState extends State<RegisterAccount> {
         email: userEmail.text,
         password: userPass.text,
       );
+
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(UserCredential.user!.uid)
+          .set({
+        'firstname': userFirstName.text.trim(),
+        'lastname': userLastName.text.trim(),
+        'email': userEmail.text.trim().toLowerCase(),
+      });
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'email-already-in-use':
@@ -145,7 +154,7 @@ class RegisterState extends State<RegisterAccount> {
     }
 
     //sendLink();
-    emailCheckAndStore();
+    // emailCheckAndStore();
   }
 
 /*Add the user into the user collections in Firebase. This is called after the 
