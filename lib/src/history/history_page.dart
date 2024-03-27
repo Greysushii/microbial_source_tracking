@@ -388,29 +388,33 @@ class _HistoryPageState extends State<HistoryPage> {
     DateTime currentDate = DateTime.now(); // using DateTime class to grab current date, which can be modified in the DatePicker below for filtering purposes
     DateTime actualDate = DateTime.now();
   
-    bool showAllDocuments = true;
+    bool showAllDates = true;
   
  
   
-    Stream<QuerySnapshot> getDocumentStream() {
+  Stream<QuerySnapshot> getDocumentStream() {
     DateTime start = DateTime(currentDate.year, currentDate.month, currentDate.day);
     DateTime end = start.add(Duration(days: 1));
-  
+    
     Query collectionQuery = FirebaseFirestore.instance.collection('images');
     
-    if (!showAllDocuments) {
+    if (!showAllDates) {
       collectionQuery = collectionQuery.where('uploadedDate', isGreaterThanOrEqualTo: start).where('uploadedDate', isLessThan: end);
     }
-  
+    
     if (selectedLakes.isNotEmpty) {
       collectionQuery = collectionQuery.where('lake', whereIn: selectedLakes);
     }
-  
-    collectionQuery = collectionQuery.orderBy('uploadedDate', descending: true);
-  
-    return collectionQuery.snapshots();
+
+    if (selectedUsers.isNotEmpty) {
+      collectionQuery = collectionQuery.where('uploader\'s email', whereIn: selectedUsers);
+    }
     
+    collectionQuery = collectionQuery.orderBy('uploadedDate', descending: true);
+    
+    return collectionQuery.snapshots(); 
   }
+
  
  
  
@@ -517,11 +521,11 @@ class _HistoryPageState extends State<HistoryPage> {
                             if (pickedDate != null) {
                               setState(() {
                                 currentDate = pickedDate;
-                                showAllDocuments = false;
+                                showAllDates = false;
                               });
                             } else {
                               setState(() {
-                                showAllDocuments = true;
+                                showAllDates = true;
                               });
                             }
                           },
@@ -548,7 +552,6 @@ class _HistoryPageState extends State<HistoryPage> {
                                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)
                               ),
                               Icon(Icons.person),
-                              // Text("Select Location"),
                             ]
                           ),
                           onPressed: () {
@@ -562,14 +565,16 @@ class _HistoryPageState extends State<HistoryPage> {
                     child: Text('Reset'),
                     onPressed: () {
                       setState(() {
-                        showAllDocuments = true;
+                        showAllDates = true;
+                        selectedLakes = [];
+                        selectedUsers = [];
                       });
                     },
                   ),
                 ],   
               ),
                 Text(
-                  showAllDocuments ? 'All History' : 'History From: ${DateFormat('MM-dd-yyyy').format(currentDate)}',
+                  showAllDates ? 'All History' : 'History From: ${DateFormat('MM-dd-yyyy').format(currentDate)}',
                   style: TextStyle(fontSize: 18)
                 ),
               
