@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geolocator_apple/geolocator_apple.dart';
+import 'package:geolocator_android/geolocator_android.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -33,53 +35,99 @@ class _HistoryPageState extends State<HistoryPage> {
     });
   }
 
+  double uploadProgress = 0.0;
+
   Future uploadFile() async {
-    var locationPermissionStatus = await Permission.location.request();
+    bool serviceEnabled;
+    LocationPermission permission;
 
-    if (locationPermissionStatus == PermissionStatus.granted) {
-      final path = 'images/${pickedFile!.name}';
-      final file = File(pickedFile!.path!);
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      print('location disabled');
+      return Future.error('Location services are disabled.');
+    }
 
-      String? waterSource = await getWaterSource();
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
 
-      if (waterSource != null) {
-        final ref = FirebaseStorage.instance.ref().child(path);
-        TaskSnapshot firebaseStorageUpload = await ref.putFile(
-            file); // waiting for FB storage upload to complete before grabbing URL
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
 
-        String currentUserEmail =
-            FirebaseAuth.instance.currentUser?.email ?? "";
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
 
-        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-            .collection('users')
-            .where('email', isEqualTo: currentUserEmail)
-            .get();
+    final path = 'images/${pickedFile!.name}';
+    final file = File(pickedFile!.path!);
 
-        DocumentSnapshot currentUserInfo = querySnapshot.docs.first;
+    String? waterSource = await getWaterSource();
 
-        String uploadedDate = DateFormat('MM-dd-yyyy').format(actualDate);
+    if (waterSource != null) {
+      final ref = FirebaseStorage.instance.ref().child(path);
 
-        var userLocation = await Geolocator.getCurrentPosition();
+      setState(() {
+        uploadProgress = 0.0;
+      });
 
-        final image = <String, dynamic>{
-          "title": '$waterSource $uploadedDate',
-          "uploadedDate": FieldValue.serverTimestamp(),
-          "imageURL": await firebaseStorageUpload.ref.getDownloadURL(),
-          "lake": waterSource,
-          "uploader's email": currentUserEmail,
-          "uploader's first name": currentUserInfo['firstname'],
-          "uploader's last name": currentUserInfo['lastname'],
-          "latitude": userLocation.latitude,
-          "longitude": userLocation.longitude,
-        };
+      final task = ref.putFile(
+        file,
+        SettableMetadata(customMetadata: {'uploadProgress': '$uploadProgress'}),
+      );
 
-        await db.collection("images").add(image).then((DocumentReference doc) {
-          // adds doc created above to collection
-          print('DocumentSnapshot added with ID: ${doc.id}');
+      task.snapshotEvents.listen((TaskSnapshot snapshot) {
+        setState(() {
+          uploadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
+        });
+      });
 
-          setState(() {
-            pickedFile = null;
-          });
+      await task; //must wait for firebase storage upload to complete first before grabbing downloadURL for cloud firestore document field
+
+      String currentUserEmail = FirebaseAuth.instance.currentUser?.email ?? "";
+
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: currentUserEmail)
+          .get();
+      DocumentSnapshot currentUserInfo = querySnapshot.docs.first;
+
+      String uploadedDate = DateFormat('MM-dd-yyyy').format(actualDate);
+
+      var userLocation = await Geolocator.getCurrentPosition();
+
+      final image = <String, dynamic>{
+        "title": '$waterSource $uploadedDate',
+        "uploadedDate": FieldValue.serverTimestamp(),
+        "imageURL": await ref.getDownloadURL(),
+        "lake": waterSource,
+        "uploader's email": currentUserEmail,
+        "uploader's first name": currentUserInfo['firstname'],
+        "uploader's last name": currentUserInfo['lastname'],
+        "latitude": userLocation.latitude,
+        "longitude": userLocation.longitude,
+      };
+
+      await db.collection("images").add(image).then((DocumentReference doc) {
+        print('DocumentSnapshot added with ID: ${doc.id}');
+
+        setState(() {
+          pickedFile = null;
+          uploadProgress = 0.0;
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -87,8 +135,10 @@ class _HistoryPageState extends State<HistoryPage> {
             content: Text('File Uploaded!'),
           ),
         );
-      }
+      });
     }
+
+    print(Geolocator.getCurrentPosition());
   }
 
   Future getWaterSource() async {
@@ -109,7 +159,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Accessing User Location...'),
+                      content: Text('Uploading File...'),
                     ),
                   );
 
@@ -174,6 +224,9 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
+  List<String> selectedLakes = [];
+  List<String> selectedUsers = [];
+
   Future getLakeOptions() async {
     QuerySnapshot lakeQuery = await FirebaseFirestore.instance
         .collection('images')
@@ -188,7 +241,79 @@ class _HistoryPageState extends State<HistoryPage> {
     return lakeOptions;
   }
 
-  List<String> selectedLakes = [];
+  Future getUserOptions() async {
+    QuerySnapshot userQuery = await FirebaseFirestore.instance
+        .collection('users')
+        .orderBy('email')
+        .get();
+
+    List<String> userOptions = userQuery.docs
+        .map((doc) => (doc['email'] as String?) ?? "")
+        .toSet()
+        .toList();
+
+    return userOptions;
+  }
+
+  Future openUserOptions() async {
+    List<String> userChoices = await getUserOptions();
+
+    bool result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text('Select Users'),
+          children: [
+            SingleChildScrollView(
+              child: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return Column(
+                    children: userChoices.map((user) {
+                      return CheckboxListTile(
+                        title: Text(user),
+                        value: selectedUsers.contains(user),
+                        onChanged: (value) {
+                          setState(() {
+                            if (value!) {
+                              selectedUsers.add(user);
+                            } else {
+                              selectedUsers.remove(user);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                ),
+                TextButton(
+                  child: Text('Done'),
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                    setState(() {});
+                  },
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result != null && result) {
+      print('Selected Users: $selectedUsers');
+    }
+  }
 
   Future openLakeOptions() async {
     List<String> lakeChoices = await getLakeOptions();
@@ -245,7 +370,7 @@ class _HistoryPageState extends State<HistoryPage> {
       },
     );
 
-    if (result) {
+    if (result != null && result) {
       print('Selected Lakes: $selectedLakes');
     }
   }
@@ -324,27 +449,32 @@ class _HistoryPageState extends State<HistoryPage> {
                 ],
               ),
               pickedFile != null
-                  ? Container(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: Card(
-                        child: ListTile(
-                          title: Text('Selected file: ${pickedFile!.name}',
-                              textAlign: TextAlign.center),
-                          onTap: () {
-                            showSelectedFile();
-                          },
-                        ),
-                      ),
-                    )
+                  ? (uploadProgress > 0.0
+                      ? LinearProgressIndicator(
+                          value: uploadProgress,
+                          backgroundColor: Colors.grey[200],
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.blue),
+                        )
+                      : Container(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          child: Card(
+                            child: ListTile(
+                              title: Text(
+                                'Selected file: ${pickedFile!.name}',
+                                textAlign: TextAlign.center,
+                              ),
+                              onTap: showSelectedFile,
+                            ),
+                          ),
+                        ))
                   : Container(
                       width: MediaQuery.of(context).size.width * 0.8,
                       child: const Card(
                         child: ListTile(
                           title: Text(
                             'Selected file appears here',
-                            style: TextStyle(
-                              fontStyle: FontStyle.italic,
-                            ),
+                            style: TextStyle(fontStyle: FontStyle.italic),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -359,10 +489,10 @@ class _HistoryPageState extends State<HistoryPage> {
                       children: [
                         TextButton(
                           child: const Row(children: [
-                            Icon(Icons.date_range),
-                            Text("Select Date",
+                            Text("Date ",
                                 style: TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.bold))
+                                    fontSize: 15, fontWeight: FontWeight.bold)),
+                            Icon(Icons.date_range),
                           ]),
                           onPressed: () async {
                             DateTime? pickedDate = await showDatePicker(
@@ -385,11 +515,26 @@ class _HistoryPageState extends State<HistoryPage> {
                         ),
                         TextButton(
                             child: const Row(children: [
+                              Text("Location",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold)),
                               Icon(Icons.location_on),
-                              Text("Select Location"),
                             ]),
                             onPressed: () {
                               openLakeOptions();
+                            }),
+                        TextButton(
+                            child: const Row(children: [
+                              Text("User",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold)),
+                              Icon(Icons.person),
+                              // Text("Select Location"),
+                            ]),
+                            onPressed: () {
+                              openUserOptions();
                             }),
                       ],
                     ),
