@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +13,7 @@ class AccountData extends StatefulWidget {
 class _AccountDataState extends State<AccountData> {
   final user = FirebaseAuth.instance.currentUser!;
   TextEditingController newValue = TextEditingController();
+  bool saveDisabled = true;
 
   @override
   void dispose() {
@@ -32,11 +34,77 @@ class _AccountDataState extends State<AccountData> {
         .catchError((error) => print('failed to update user: $error'));
   }
 
-  Future<void> updateEmail() {
-    return user
-        .verifyBeforeUpdateEmail(newValue.text.trim())
-        .then((value) => print('user email updated'))
-        .catchError((error) => print('failed to update user: $error'));
+  Future<void> updateEmail() async {
+    try {
+      String password = newValue.text.trim();
+
+      AuthCredential credential =
+          EmailAuthProvider.credential(email: user.email!, password: password);
+
+      await user.reauthenticateWithCredential(credential);
+
+      return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Change email'),
+          content: TextFormField(
+            autofocus: true,
+            decoration: const InputDecoration(hintText: 'Enter new email'),
+            controller: newValue,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (text) {
+              if (text == null || text.isEmpty) {
+                return "Please enter an email";
+              }
+              if (!EmailValidator.validate(newValue.text.trim())) {
+                return "Please enter a valid email";
+              }
+              return null;
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => {clearText(), Navigator.pop(context)},
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => {
+                if (EmailValidator.validate(newValue.text.trim()))
+                  {
+                    user
+                        .verifyBeforeUpdateEmail(newValue.text.trim())
+                        .then((value) => print('user email updated'))
+                        .catchError(
+                            (error) => print('failed to update user: $error')),
+                    updateUser('email'),
+                  },
+                if (!EmailValidator.validate(newValue.text.trim()))
+                  {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            'Could not update user information: invalid email'),
+                      ),
+                    )
+                  },
+                clearText(),
+                Navigator.pop(context)
+              },
+              child: const Text('Save'),
+            )
+          ],
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+        ),
+      );
+    } catch (e) {
+      print('error during reauthentication: $e');
+      // setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Password is incorrect!'),
+        ),
+      );
+    }
   }
 
   Future<void> updatePassword() async {
@@ -82,7 +150,11 @@ class _AccountDataState extends State<AccountData> {
       );
     } catch (e) {
       print('error during reauthentication: $e');
-      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Password is incorrect!'),
+        ),
+      );
     }
   }
 
@@ -103,53 +175,26 @@ class _AccountDataState extends State<AccountData> {
                 children: [
                   // user email
                   buildAccountDataCard(
-                    title: 'Email',
-                    value: userData['email'] ?? '',
-                    onEditPressed: () => showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Change email'),
-                        content: TextField(
-                          autofocus: true,
-                          decoration: const InputDecoration(
-                              hintText: 'Enter new email'),
-                          controller: newValue,
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () =>
-                                {clearText(), Navigator.pop(context)},
-                            child: const Text('Cancel'),
-                          ),
-                          TextButton(
-                            onPressed: () => {
-                              updateEmail(),
-                              updateUser('email'),
-                              clearText(),
-                              Navigator.pop(context)
-                            },
-                            child: const Text('Save'),
-                          )
-                        ],
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5)),
-                      ),
-                    ),
-                  ),
-
-                  // user first name
-                  buildAccountDataCard(
-                      title: 'First name',
-                      value: userData['firstname'] ?? '',
+                      title: 'Email',
+                      value: userData['email'] ?? '',
                       onEditPressed: () => showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: const Text('Change first name'),
-                              content: TextField(
+                              title: const Text('Change email'),
+                              content: TextFormField(
                                 autofocus: true,
                                 decoration: const InputDecoration(
-                                    hintText: 'Enter new name'),
+                                    hintText: 'Enter current password'),
                                 controller: newValue,
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                validator: (text) {
+                                  if (text == null || text.isEmpty) {
+                                    return "Please enter your current password";
+                                  }
+                                  return null;
+                                },
+                                obscureText: true,
                               ),
                               actions: [
                                 TextButton(
@@ -159,9 +204,51 @@ class _AccountDataState extends State<AccountData> {
                                 ),
                                 TextButton(
                                   onPressed: () => {
-                                    updateUser('firstname'),
-                                    clearText(),
+                                    if (newValue.text.trim().isNotEmpty)
+                                      {updateEmail(), clearText()},
                                     Navigator.pop(context)
+                                  },
+                                  child: const Text('OK'),
+                                )
+                              ],
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5)),
+                            ),
+                          )),
+
+                  // user first name
+                  buildAccountDataCard(
+                      title: 'First name',
+                      value: userData['firstname'] ?? '',
+                      onEditPressed: () => showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Change first name'),
+                              content: TextFormField(
+                                autofocus: true,
+                                decoration: const InputDecoration(
+                                    hintText: 'Enter new name'),
+                                controller: newValue,
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                validator: (text) {
+                                  if (text == null || text.isEmpty) {
+                                    return "Please enter a name";
+                                  }
+                                  return null;
+                                },
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      {clearText(), Navigator.pop(context)},
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () => {
+                                    if (newValue.text.trim().isNotEmpty)
+                                      {updateUser('firstname'), clearText()},
+                                    Navigator.pop(context),
                                   },
                                   child: const Text('Save'),
                                 )
@@ -179,11 +266,19 @@ class _AccountDataState extends State<AccountData> {
                             context: context,
                             builder: (context) => AlertDialog(
                               title: const Text('Change last name'),
-                              content: TextField(
+                              content: TextFormField(
                                 autofocus: true,
                                 decoration: const InputDecoration(
                                     hintText: 'Enter new name'),
                                 controller: newValue,
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                validator: (text) {
+                                  if (text == null || text.isEmpty) {
+                                    return "Please enter a name";
+                                  }
+                                  return null;
+                                },
                               ),
                               actions: [
                                 TextButton(
@@ -193,8 +288,8 @@ class _AccountDataState extends State<AccountData> {
                                 ),
                                 TextButton(
                                   onPressed: () => {
-                                    updateUser('lastname'),
-                                    clearText(),
+                                    if (newValue.text.trim().isNotEmpty)
+                                      {updateUser('lastname'), clearText()},
                                     Navigator.pop(context),
                                   },
                                   child: const Text('Save'),
@@ -213,11 +308,20 @@ class _AccountDataState extends State<AccountData> {
                             context: context,
                             builder: (context) => AlertDialog(
                               title: const Text('Change password'),
-                              content: TextField(
+                              content: TextFormField(
                                 autofocus: true,
                                 decoration: const InputDecoration(
-                                    hintText: 'Reenter current password'),
+                                    hintText: 'Enter current password'),
                                 controller: newValue,
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                validator: (text) {
+                                  if (text == null || text.isEmpty) {
+                                    return "Please enter your current password";
+                                  }
+                                  return null;
+                                },
+                                obscureText: true,
                               ),
                               actions: [
                                 TextButton(
@@ -227,8 +331,8 @@ class _AccountDataState extends State<AccountData> {
                                 ),
                                 TextButton(
                                   onPressed: () => {
-                                    updatePassword(),
-                                    clearText(),
+                                    if (newValue.text.trim().isNotEmpty)
+                                      {updatePassword(), clearText()},
                                     Navigator.pop(context)
                                   },
                                   child: const Text('OK'),
