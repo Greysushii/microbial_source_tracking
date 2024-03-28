@@ -391,42 +391,52 @@ class RegisterState extends State<Register> {
 
         //Registration button-----------------------------------------------
         const SizedBox(height: 20),
-        Container(
-          margin: const EdgeInsets.symmetric(
-            horizontal: 30,
-          ),
-          child: ElevatedButton(
-            onPressed: () {
-              setState(() {
-                //Check if the values are the same, and if the boxes are not empty
-                if (kDebugMode) {
-                  print("Strength $passStrength \nConfirm $passConfirm \n");
-                }
-                //User entered nothing
-                if (((checkButton()) == false)) {
-                  alertMessage(1);
-                }
-                //User entered a weak password. Reset password and try again
-                else if (((passStrength) == false)) {
-                  alertMessage(2);
-                  clearPassword();
-                }
-                //Password meets strength, but are not equal
-                else if (((passConfirm) == false)) {
-                  alertMessage(3);
-                  clearPassword();
-                }
-                //Password is strong, both are equal, and email is unique
-                else if (((passStrength & passConfirm) == true)) {
-                  registerUser(
-                      uEmail: userEmail.text,
-                      uPass: userPass.text,
-                      context: context);
-                  uniqueEmail = true;
-                }
-              });
-            },
-            child: const Text('Sign Up', style: TextStyle(fontSize: 20)),
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              //Check if the values are the same, and if the boxes are not empty
+              if (kDebugMode) {
+                print("Strength $passStrength \nConfirm $passConfirm \n");
+              }
+              //User entered nothing
+              if (((checkButton()) == false)) {
+                alertMessage(1);
+              }
+              //User entered a weak password. Reset password and try again
+              else if (((passStrength) == false)) {
+                alertMessage(2);
+                clearPassword();
+              }
+              //Password meets strength, but are not equal
+              else if (((passConfirm) == false)) {
+                alertMessage(3);
+                clearPassword();
+              }
+              //Password is strong, both are equal, and email is unique
+              else if (((passStrength & passConfirm) == true)) {
+                registerUser(
+                    uEmail: userEmail.text,
+                    uPass: userPass.text,
+                    context: context);
+                uniqueEmail = true;
+              }
+            });
+          },
+          child: Container(
+            padding: const EdgeInsets.all(15),
+            margin: const EdgeInsets.symmetric(horizontal: 50),
+            decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 52, 52, 52),
+                borderRadius: BorderRadius.circular(8)),
+            child: const Center(
+                child: Text(
+              'Create account',
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            )),
           ),
         ),
       ]),

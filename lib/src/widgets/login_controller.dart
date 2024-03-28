@@ -95,13 +95,14 @@ class _LoginState extends State<Login> {
               child: TextFormField(
                 controller: emailController,
                 decoration: const InputDecoration(
+                  labelText: 'Email',
                   enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
                   focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey)),
                   fillColor: Colors.white,
                   filled: true,
-                  hintText: "Enter email here...",
+                  hintText: "Enter Email...",
                 ),
               ),
             ),
@@ -114,13 +115,14 @@ class _LoginState extends State<Login> {
                 controller: passwordController,
                 obscureText: passVisible,
                 decoration: InputDecoration(
+                  labelText: 'Password',
                   enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
                   focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey)),
                   fillColor: Colors.white,
                   filled: true,
-                  hintText: "Enter password here...",
+                  hintText: "Enter password...",
                   //Show/hide contents of "Confirm password"
                   suffixIcon: IconButton(
                     icon: Icon(
