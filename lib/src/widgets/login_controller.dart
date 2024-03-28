@@ -2,6 +2,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:microbial_source_tracking/src/auth/auth_page.dart';
 import 'package:microbial_source_tracking/src/home/home_view.dart';
 
 class Login extends StatefulWidget {
@@ -42,7 +43,7 @@ class _LoginState extends State<Login> {
     } else {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => HomeView()),
+        MaterialPageRoute(builder: (context) => AuthPage()),
       );
     }
     wrongCredentials = false;

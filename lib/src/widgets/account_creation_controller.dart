@@ -6,36 +6,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:microbial_source_tracking/src/auth/auth_page.dart';
 import 'package:microbial_source_tracking/src/home/home_view.dart';
 
 FirebaseAuth auth = FirebaseAuth.instance;
-
-//Save the user's email and password when entering
-TextEditingController userFirstName = TextEditingController();
-TextEditingController userLastName = TextEditingController();
-TextEditingController userEmail = TextEditingController();
-TextEditingController userPass = TextEditingController();
-TextEditingController userPassConfirm = TextEditingController();
-
-//Initial password requirement check. True if password field meets strength req
-bool passStrength = false;
-//Once both passwords match, this becomes true
-bool passConfirm = false;
-
-bool uniqueEmail = true;
-
-//Check if all the fields are filled
-bool checkButton() {
-  if ((userEmail.text.isEmpty |
-      userFirstName.text.isEmpty |
-      userLastName.text.isEmpty |
-      userPass.text.isEmpty |
-      userPassConfirm.text.isEmpty)) {
-    return false;
-  } else {
-    return true;
-  }
-}
 
 //Register is the name of this widget,
 //refer to Register for routing purposes
@@ -49,7 +23,32 @@ class Register extends StatefulWidget {
 
 class RegisterState extends State<Register> {
   //retrieve text from input
-  final myController = TextEditingController();
+//Save the user's email and password when entering
+  final userFirstName = TextEditingController();
+  final userLastName = TextEditingController();
+  final userEmail = TextEditingController();
+  final userPass = TextEditingController();
+  final userPassConfirm = TextEditingController();
+
+//Initial password requirement check. True if password field meets strength req
+  bool passStrength = false;
+//Once both passwords match, this becomes true
+  bool passConfirm = false;
+
+  bool uniqueEmail = true;
+
+//Check if all the fields are filled
+  bool checkButton() {
+    if ((userEmail.text.isEmpty |
+        userFirstName.text.isEmpty |
+        userLastName.text.isEmpty |
+        userPass.text.isEmpty |
+        userPassConfirm.text.isEmpty)) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 
   Future<void> alertMessage(int issue) async {
     String issueTitle = " ";
@@ -100,7 +99,7 @@ class RegisterState extends State<Register> {
                 if (issue == 5) {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => HomeView()),
+                    MaterialPageRoute(builder: (context) => AuthPage()),
                   );
                 } else {
                   Navigator.of(context).pop();
@@ -175,6 +174,11 @@ class RegisterState extends State<Register> {
         'email': userEmail.text.trim().toLowerCase(),
       });
       FirebaseAuth.instance.currentUser?.sendEmailVerification();
+      //alertMessage(5);
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: uEmail,
+        password: uPass,
+      );
       alertMessage(5);
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
@@ -198,7 +202,11 @@ class RegisterState extends State<Register> {
   @override
   void dispose() {
     //clean up controller when widget is done using it.
-    myController.dispose();
+    userFirstName.dispose();
+    userLastName.dispose();
+    userEmail.dispose();
+    userPass.dispose();
+    userPassConfirm.dispose();
     super.dispose();
   }
 
