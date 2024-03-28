@@ -24,12 +24,12 @@ dependencies:
   intl: ^0.18.0
   geolocator: ^8.0.0 # get phone location 
   permission_handler: ^11.3.0 # handles permission for accessing phone location
-
-
+  email_validator: ^2.1.16
 
 
   flutter_gen: any
   cloud_firestore: ^4.15.6
+  location: ^5.0.3
   firebase_dynamic_links: ^5.4.18
   firebase_admin: ^0.2.0
 dev_dependencies:
