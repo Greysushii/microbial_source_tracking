@@ -105,13 +105,15 @@ class _HistoryPageState extends State<HistoryPage> {
           await task; //must wait for firebase storage upload to complete first before grabbing downloadURL for cloud firestore document field
 
           String currentUserEmail = FirebaseAuth.instance.currentUser?.email ?? "";
-
+          
           QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('users').where('email', isEqualTo: currentUserEmail).get();
           DocumentSnapshot currentUserInfo = querySnapshot.docs.first;
-
+          
           String uploadedDate = DateFormat('MM-dd-yyyy').format(actualDate);
-
+          
           var userLocation = await Geolocator.getCurrentPosition();
+
+          
 
           final image = <String, dynamic>{
             "title": '$waterSource $uploadedDate',
@@ -304,7 +306,9 @@ class _HistoryPageState extends State<HistoryPage> {
                     child: Text('Done'),
                     onPressed: () {
                       Navigator.of(context).pop(true);
-                      setState(() {});
+                      setState(() {
+                        selectedLakes = [];
+                      });
                     },
                   ),
                 ],
@@ -368,7 +372,9 @@ class _HistoryPageState extends State<HistoryPage> {
                     child: Text('Done'),
                     onPressed: () {
                       Navigator.of(context).pop(true);
-                      setState(() {});
+                      setState(() {
+                        selectedUsers = [];
+                      });
                     },
                   ),
                 ],
