@@ -91,9 +91,7 @@ class _HistoryPageState extends State<HistoryPage> {
         });
 
         
-          final task = ref.putFile(file,
-            SettableMetadata(customMetadata: {'uploadProgress': '$uploadProgress'}),
-          );
+          final task = ref.putFile(file);
 
           task.snapshotEvents.listen((TaskSnapshot snapshot) {
             setState(() {
@@ -334,7 +332,7 @@ class _HistoryPageState extends State<HistoryPage> {
         context: context,
         builder: (BuildContext context) {
           return SimpleDialog(
-            title: Text('Select Lakes'),
+            title: Text('Select Location'),
             children: [
               SingleChildScrollView(
                 child: StatefulBuilder(
