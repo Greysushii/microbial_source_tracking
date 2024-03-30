@@ -69,7 +69,7 @@ class _ConfigView extends State<ConfigView> {
   String _pinState = 'off';
   void _sendCommand(String pinState) async {
 
-    String url = 'https://eccd-2600-6c48-647f-765d-00-1c93.ngrok-free.app/control'; //enter pyngrok generated url
+    String url = 'https://a326-2600-1007-b056-c5f5-5c9-64a3-a2a2-bf45.ngrok-free.app//control'; //enter pyngrok generated url
     Map<String, String> headers = {'Content-Type': 'application/json'};
     String body = jsonEncode({'pin_state': pinState});
 

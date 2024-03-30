@@ -49,7 +49,7 @@ class RegisterView extends StatelessWidget {
         alignment: Alignment.topCenter,
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           const Text('Already have an account? ',
-              style: TextStyle(fontSize: 20)),
+              style: TextStyle(fontSize: 16)),
           InkWell(
             onTap: () {
               Navigator.push(
@@ -64,7 +64,7 @@ class RegisterView extends StatelessWidget {
               style: TextStyle(
                   color: Colors.blue,
                   fontWeight: FontWeight.bold,
-                  fontSize: 20),
+                  fontSize: 16),
             ),
           )
         ]),

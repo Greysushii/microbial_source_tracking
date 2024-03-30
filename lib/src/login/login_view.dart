@@ -56,7 +56,7 @@ class LoginView extends StatelessWidget {
                             },
                             child: const Text('Forgot password?',
                                 style: TextStyle(
-                                    color: Colors.black, fontSize: 20)),
+                                    color: Colors.black, fontSize: 16)),
                           )
                         ]),
                   ),
@@ -70,7 +70,7 @@ class LoginView extends StatelessWidget {
         alignment: Alignment.topCenter,
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           const Text('Don\'t have an account? ',
-              style: TextStyle(fontSize: 20)),
+              style: TextStyle(fontSize: 16)),
           InkWell(
             onTap: () {
               Navigator.push(
@@ -85,7 +85,7 @@ class LoginView extends StatelessWidget {
               style: TextStyle(
                   color: Colors.blue,
                   fontWeight: FontWeight.bold,
-                  fontSize: 20),
+                  fontSize: 16),
             ),
           )
         ]),
