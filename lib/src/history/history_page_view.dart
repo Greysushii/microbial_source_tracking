@@ -20,7 +20,7 @@ class HistoryPageView extends StatelessWidget {
     double longitude = doc['longitude'];
 
     return Scaffold(
-        appBar: AppBar(title: Text(imageName)),
+        appBar: AppBar(title: Text('Image details')),
         body: SafeArea(
           child: Container(
               padding: const EdgeInsets.all(8.0),
@@ -30,15 +30,26 @@ class HistoryPageView extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.network(imageURL),
+                  SizedBox(
+                    height: 275,
+                    child: Center(child: Image.network(imageURL)),
+                  ),
                   const SizedBox(height: 10),
-                  Text(imageName),
-                  Text('Latitude: $latitude'),
-                  Text('Longitude: $longitude'),
-                  Text('Upload Time: $uploadTime'),
-                  Text('Uploader\'s Email: $uploaderEmail'),
-                  Text('Uploader\'s First Name: $uploaderFirstName'),
-                  Text('Uploader\'s Last Name: $uploaderLastName')
+                  Text(imageName,
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                  Text('Latitude: $latitude',
+                      style: const TextStyle(fontSize: 18)),
+                  Text('Longitude: $longitude',
+                      style: const TextStyle(fontSize: 18)),
+                  Text('Upload Time: $uploadTime',
+                      style: const TextStyle(fontSize: 18)),
+                  Text('Uploader\'s Email: $uploaderEmail',
+                      style: const TextStyle(fontSize: 18)),
+                  Text('Uploader\'s First Name: $uploaderFirstName',
+                      style: const TextStyle(fontSize: 18)),
+                  Text('Uploader\'s Last Name: $uploaderLastName',
+                      style: const TextStyle(fontSize: 18))
                 ],
               )),
         ));
