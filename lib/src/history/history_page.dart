@@ -469,24 +469,24 @@ class _HistoryPageState extends State<HistoryPage> {
                 ],
               ),
               pickedFile != null
-              ? (uploadProgress > 0.0
-                  ? LinearProgressIndicator(
-                      value: uploadProgress,
-                      backgroundColor: Colors.grey[200], 
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-                    )
-                  : Container(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: Card(
-                        child: ListTile(
-                          title: Text(
-                            'Selected file: ${pickedFile!.name}',
-                            textAlign: TextAlign.center,
+                ? (uploadProgress > 0.0
+                    ? LinearProgressIndicator(
+                        value: uploadProgress,
+                        backgroundColor: Colors.grey[200], 
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                      )
+                    : Container(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        child: Card(
+                          child: ListTile(
+                            title: Text(
+                              'Selected file: ${pickedFile!.name}',
+                              textAlign: TextAlign.center,
+                            ),
+                            onTap: showSelectedFile,
                           ),
-                          onTap: showSelectedFile,
                         ),
-                      ),
-                    ))
+                      ))
               : Container(
                   width: MediaQuery.of(context).size.width * 0.8,
                   child: const Card(
@@ -587,58 +587,67 @@ class _HistoryPageState extends State<HistoryPage> {
                 stream: getDocumentStream(),
                 builder: (context, snapshot) {
                   List<QueryDocumentSnapshot> documents = snapshot.data?.docs ?? [];
-  
+
                   if (documents.isEmpty) {
                     return Text('No files found with current filters.');
                   }
-  
+
                   return Column(
                     children: documents.map((doc) {
                       String imageName = doc['title'];
                       String documentID = doc.id; // reference in case of deleting
                       String imageURL = doc['imageURL']; // reference in case of deleting
-  
-                      return Card(
-                        child: ListTile(
-                          title: Text('$imageName'),
-                          onTap: () {
-                            showFile(doc);
-                          },
-                          trailing: IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () async {
-                              bool deletionConfirmation = await showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    content: Text('Are you sure you want to delete this file?'),
-                                    actions: [
-                                      TextButton(
-                                        child: Text('Cancel'),
-                                        onPressed: () {
-                                          Navigator.of(context).pop(false);
-                                        },
-                                      ),
-                                      TextButton(
-                                        child: Text('Delete'),
-                                        onPressed: () {
-                                          Navigator.of(context).pop(true);
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-  
-                              if (deletionConfirmation == true) {
-                                await db.collection("images").doc(documentID).delete();
-                                await FirebaseStorage.instance.refFromURL(imageURL).delete();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('File Deleted'),
+
+                      return Dismissible(
+                        key: UniqueKey(), 
+                        direction: DismissDirection.endToStart,
+                        confirmDismiss: (direction) async {
+                          return await showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                content: Text('Are you sure you want to delete this file?'),
+                                actions: [
+                                  TextButton(
+                                    child: Text('Cancel'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop(false);
+                                    },
                                   ),
-                                );
-                              }
+                                  TextButton(
+                                    child: Text('Delete'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop(true);
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        onDismissed: (direction) async {
+                          await db.collection("images").doc(documentID).delete();
+                          await FirebaseStorage.instance.refFromURL(imageURL).delete();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('File Deleted'),
+                            ),
+                          );
+                        },
+                        background: Container(
+                          color: Colors.red,
+                          child: const ListTile(
+                            leading: Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        child: Card(
+                          child: ListTile(
+                            title: Text('$imageName'),
+                            onTap: () {
+                              showFile(doc);
                             },
                           ),
                         ),
