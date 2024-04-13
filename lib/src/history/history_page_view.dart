@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:microbial_source_tracking/src/themes/glwa_theme.dart';
 
 class HistoryPageView extends StatelessWidget {
   final QueryDocumentSnapshot doc;
@@ -20,8 +21,8 @@ class HistoryPageView extends StatelessWidget {
     double longitude = doc['longitude'];
 
     return Scaffold(
-        appBar: AppBar(title: Text('Image details')),
-        body: SafeArea(
+        appBar: AppBar(title: Text(imageName)),
+        body: SingleChildScrollView(
           child: Container(
               padding: const EdgeInsets.all(8.0),
               constraints: BoxConstraints(
@@ -32,26 +33,69 @@ class HistoryPageView extends StatelessWidget {
                 children: [
                   SizedBox(
                     height: 275,
-                    child: Center(child: Image.network(imageURL)),
+                    child: Center(
+                        child: Image.network(
+                      imageURL,
+                      loadingBuilder: ((context, child, loadingProgress) {
+                        if (loadingProgress == null) {
+                          return child;
+                        } else {
+                          return const Center(
+                            // If the image is still loading, display a circular
+                            // progress indicator
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                      }),
+                    )),
                   ),
-                  const SizedBox(height: 10),
-                  Text(imageName,
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                  Text('Latitude: $latitude',
-                      style: const TextStyle(fontSize: 18)),
-                  Text('Longitude: $longitude',
-                      style: const TextStyle(fontSize: 18)),
-                  Text('Upload Time: $uploadTime',
-                      style: const TextStyle(fontSize: 18)),
-                  Text('Uploader\'s Email: $uploaderEmail',
-                      style: const TextStyle(fontSize: 18)),
-                  Text('Uploader\'s First Name: $uploaderFirstName',
-                      style: const TextStyle(fontSize: 18)),
-                  Text('Uploader\'s Last Name: $uploaderLastName',
-                      style: const TextStyle(fontSize: 18))
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    child: Column(
+                      children: [
+                        buildMetadataCard(
+                            title: 'Coordinates',
+                            value: '($latitude, $longitude)'),
+                        buildMetadataCard(
+                            title: 'Upload time', value: uploadTime),
+                        buildMetadataCard(
+                            title: 'Uploader email', value: uploaderEmail),
+                        buildMetadataCard(
+                            title: 'Uploader name',
+                            value: '$uploaderFirstName $uploaderLastName'),
+                      ],
+                    ),
+                  ),
                 ],
               )),
         ));
+  }
+
+  // Creates a container that holds given metadata fields
+  Widget buildMetadataCard({required String title, required String value}) {
+    return Container(
+      decoration: BoxDecoration(
+          color: glwaTheme.secondaryHeaderColor,
+          borderRadius: BorderRadius.circular(8.0)),
+      padding: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.only(left: 20, right: 20, top: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ]),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 16),
+          )
+        ],
+      ),
+    );
   }
 }
