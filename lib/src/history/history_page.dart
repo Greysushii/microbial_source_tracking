@@ -598,6 +598,8 @@ class _HistoryPageState extends State<HistoryPage> {
                       String documentID = doc.id; // reference in case of deleting
                       String imageURL = doc['imageURL']; // reference in case of deleting
 
+                      TextEditingController textEditingController = TextEditingController();
+
                       return Dismissible(
                         key: UniqueKey(), 
                         direction: DismissDirection.endToStart,
@@ -649,6 +651,39 @@ class _HistoryPageState extends State<HistoryPage> {
                             onTap: () {
                               showFile(doc);
                             },
+                            trailing: IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Edit location for $imageName'),
+                                      content: TextField(
+                                        controller: textEditingController,
+                                        decoration: InputDecoration(
+                                          hintText: 'Edit location...',
+                                        ),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          child: Text('Cancel'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: Text('Save'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
                           ),
                         ),
                       );
