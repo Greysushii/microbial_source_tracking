@@ -20,8 +20,17 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
  
   final db = FirebaseFirestore.instance; // Cloud firestore instance!
+  List<String> cachedUserOptions = [];
+  List<String> cachedLakeOptions = [];
  
   PlatformFile? pickedFile;
+
+    @override
+    void initState() {
+      super.initState();
+      fetchUserOptions();
+      fetchLakeOptions();
+    }
  
     Future selectFile() async {
       final result = await FilePicker.platform.pickFiles();
@@ -237,30 +246,27 @@ class _HistoryPageState extends State<HistoryPage> {
     List<String> selectedLakes = [];
     List<String> selectedUsers = [];
  
-    Future getLakeOptions() async {
- 
-      QuerySnapshot lakeQuery = await FirebaseFirestore.instance.collection('images').orderBy('lake').get();
- 
-      List<String> lakeOptions = lakeQuery.docs.map((doc) => (doc['lake'] as String?) ?? "").toSet().toList();
- 
-      return lakeOptions;
- 
+    Future fetchUserOptions() async {
+    if (cachedUserOptions.isEmpty) {
+      QuerySnapshot userQuery =
+          await FirebaseFirestore.instance.collection('users').orderBy('email').get();
+      cachedUserOptions =
+          userQuery.docs.map((doc) => (doc['email'] as String?) ?? "").toSet().toList();
     }
- 
-    Future getUserOptions() async {
- 
-      QuerySnapshot userQuery = await FirebaseFirestore.instance.collection('users').orderBy('email').get();
- 
-      List<String> userOptions = userQuery.docs.map((doc) => (doc['email'] as String?) ?? "").toSet().toList();
- 
-      return userOptions;
- 
+  }
+
+  Future fetchLakeOptions() async {
+    if (cachedLakeOptions.isEmpty) {
+      QuerySnapshot lakeQuery =
+          await FirebaseFirestore.instance.collection('images').orderBy('lake').get();
+      cachedLakeOptions =
+          lakeQuery.docs.map((doc) => (doc['lake'] as String?) ?? "").toSet().toList();
     }
+  }
  
     Future openUserOptions() async {
  
-      List<String> userChoices = await getUserOptions();
- 
+      await fetchUserOptions();
  
       bool result = await showDialog(
         context: context,
@@ -272,7 +278,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 child: StatefulBuilder(
                   builder: (BuildContext context, StateSetter setState) {
                     return Column(
-                  children: userChoices.map((user) {
+                  children: cachedUserOptions.map((user) {
                     return CheckboxListTile(
                       title: Text(user),
                       value: selectedUsers.contains(user),
@@ -325,8 +331,7 @@ class _HistoryPageState extends State<HistoryPage> {
  
     Future openLakeOptions() async {
  
-      List<String> lakeChoices = await getLakeOptions();
- 
+      await fetchLakeOptions();
  
       bool result = await showDialog(
         context: context,
@@ -338,7 +343,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 child: StatefulBuilder(
                   builder: (BuildContext context, StateSetter setState) {
                     return Column(
-                  children: lakeChoices.map((lake) {
+                  children: cachedLakeOptions.map((lake) {
                     return CheckboxListTile(
                       title: Text(lake),
                       value: selectedLakes.contains(lake),
@@ -657,6 +662,22 @@ class _HistoryPageState extends State<HistoryPage> {
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
+                                    TextEditingController textEditingController = TextEditingController();
+
+                                    String oldTitle = doc['title'];
+                                    String datePart = "";
+                                    bool foundDatePart = false;
+
+                                    for (int i = 0; i < oldTitle.length; i++) {
+                                      if (oldTitle[i].contains(RegExp(r'[0-9]'))) {
+                                        foundDatePart = true;
+                                      }
+
+                                      if (foundDatePart) {
+                                        datePart += oldTitle[i];
+                                      }
+                                    }
+
                                     return AlertDialog(
                                       title: Text('Edit location for $imageName'),
                                       content: TextField(
@@ -674,8 +695,30 @@ class _HistoryPageState extends State<HistoryPage> {
                                         ),
                                         TextButton(
                                           child: Text('Save'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
+                                          onPressed: () async {
+                                            String newLocation = textEditingController.text;
+                                            if (newLocation.isNotEmpty) {
+                                              Navigator.of(context).pop();
+
+                                              String newTitle = '$newLocation $datePart';
+
+                                              await db.collection("images").doc(doc.id).update({
+                                                    'lake': newLocation,
+                                                    'title': newTitle,
+                                                  });
+
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('Location and title updated!'),
+                                                ),
+                                              );
+                                            } else {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('Please enter a valid location.'),
+                                                ),
+                                              );
+                                            }
                                           },
                                         ),
                                       ],
