@@ -165,7 +165,7 @@ class _HistoryPageState extends State<HistoryPage> {
             title: Text('Sample Retrieved From: '),
             content: TextField(
               controller: waterSourceController,
-              decoration: InputDecoration(hintText: 'Lake Name'),
+              decoration: InputDecoration(hintText: 'Water Source'),
             ),
             actions: <Widget>[
               TextButton(
@@ -684,11 +684,11 @@ class _HistoryPageState extends State<HistoryPage> {
                                     }
 
                                     return AlertDialog(
-                                      title: Text('Edit location for $imageName'),
+                                      title: Text('Editing sample water source...'),
                                       content: TextField(
                                         controller: textEditingController,
                                         decoration: InputDecoration(
-                                          hintText: 'Edit location...',
+                                          hintText: 'Enter new water source...',
                                         ),
                                       ),
                                       actions: [
