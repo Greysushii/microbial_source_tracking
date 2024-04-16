@@ -23,7 +23,7 @@ dependencies:
   file_picker: ^5.1.0 # this too but for files not just images 
   firebase_storage: 11.6.0
   intl: ^0.18.0
-  geolocator: ^8.0.0 # get phone location 
+  geolocator: ^11.0.0 # get phone location 
   permission_handler: ^11.3.0 # handles permission for accessing phone location
   http: ^0.13.3
   email_validator: ^2.1.16

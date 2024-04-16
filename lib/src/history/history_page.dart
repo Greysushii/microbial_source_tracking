@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:geolocator_android/geolocator_android.dart';
+import 'package:microbial_source_tracking/src/history/history_page_view.dart';
 import 'package:permission_handler/permission_handler.dart';
  
 class HistoryPage extends StatefulWidget {
@@ -20,8 +21,17 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
  
   final db = FirebaseFirestore.instance; // Cloud firestore instance!
+  List<String> cachedUserOptions = [];
+  List<String> cachedLakeOptions = [];
  
   PlatformFile? pickedFile;
+
+    @override
+    void initState() {
+      super.initState();
+      fetchUserOptions();
+      fetchLakeOptions();
+    }
  
     Future selectFile() async {
       final result = await FilePicker.platform.pickFiles();
@@ -91,9 +101,7 @@ class _HistoryPageState extends State<HistoryPage> {
         });
 
         
-          final task = ref.putFile(file,
-            SettableMetadata(customMetadata: {'uploadProgress': '$uploadProgress'}),
-          );
+          final task = ref.putFile(file);
 
           task.snapshotEvents.listen((TaskSnapshot snapshot) {
             setState(() {
@@ -157,7 +165,7 @@ class _HistoryPageState extends State<HistoryPage> {
             title: Text('Sample Retrieved From: '),
             content: TextField(
               controller: waterSourceController,
-              decoration: InputDecoration(hintText: 'Lake Name'),
+              decoration: InputDecoration(hintText: 'Water Source'),
             ),
             actions: <Widget>[
               TextButton(
@@ -239,30 +247,27 @@ class _HistoryPageState extends State<HistoryPage> {
     List<String> selectedLakes = [];
     List<String> selectedUsers = [];
  
-    Future getLakeOptions() async {
- 
-      QuerySnapshot lakeQuery = await FirebaseFirestore.instance.collection('images').orderBy('lake').get();
- 
-      List<String> lakeOptions = lakeQuery.docs.map((doc) => (doc['lake'] as String?) ?? "").toSet().toList();
- 
-      return lakeOptions;
- 
+    Future fetchUserOptions() async {
+    if (cachedUserOptions.isEmpty) {
+      QuerySnapshot userQuery =
+          await FirebaseFirestore.instance.collection('users').orderBy('email').get();
+      cachedUserOptions =
+          userQuery.docs.map((doc) => (doc['email'] as String?) ?? "").toSet().toList();
     }
- 
-    Future getUserOptions() async {
- 
-      QuerySnapshot userQuery = await FirebaseFirestore.instance.collection('users').orderBy('email').get();
- 
-      List<String> userOptions = userQuery.docs.map((doc) => (doc['email'] as String?) ?? "").toSet().toList();
- 
-      return userOptions;
- 
+  }
+
+  Future fetchLakeOptions() async {
+    if (cachedLakeOptions.isEmpty) {
+      QuerySnapshot lakeQuery =
+          await FirebaseFirestore.instance.collection('images').orderBy('lake').get();
+      cachedLakeOptions =
+          lakeQuery.docs.map((doc) => (doc['lake'] as String?) ?? "").toSet().toList();
     }
+  }
  
     Future openUserOptions() async {
  
-      List<String> userChoices = await getUserOptions();
- 
+      await fetchUserOptions();
  
       bool result = await showDialog(
         context: context,
@@ -274,7 +279,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 child: StatefulBuilder(
                   builder: (BuildContext context, StateSetter setState) {
                     return Column(
-                  children: userChoices.map((user) {
+                  children: cachedUserOptions.map((user) {
                     return CheckboxListTile(
                       title: Text(user),
                       value: selectedUsers.contains(user),
@@ -327,20 +332,19 @@ class _HistoryPageState extends State<HistoryPage> {
  
     Future openLakeOptions() async {
  
-      List<String> lakeChoices = await getLakeOptions();
- 
+      await fetchLakeOptions();
  
       bool result = await showDialog(
         context: context,
         builder: (BuildContext context) {
           return SimpleDialog(
-            title: Text('Select Lakes'),
+            title: Text('Select Location'),
             children: [
               SingleChildScrollView(
                 child: StatefulBuilder(
                   builder: (BuildContext context, StateSetter setState) {
                     return Column(
-                  children: lakeChoices.map((lake) {
+                  children: cachedLakeOptions.map((lake) {
                     return CheckboxListTile(
                       title: Text(lake),
                       value: selectedLakes.contains(lake),
@@ -471,24 +475,24 @@ class _HistoryPageState extends State<HistoryPage> {
                 ],
               ),
               pickedFile != null
-              ? (uploadProgress > 0.0
-                  ? LinearProgressIndicator(
-                      value: uploadProgress,
-                      backgroundColor: Colors.grey[200], 
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-                    )
-                  : Container(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: Card(
-                        child: ListTile(
-                          title: Text(
-                            'Selected file: ${pickedFile!.name}',
-                            textAlign: TextAlign.center,
+                ? (uploadProgress > 0.0
+                    ? LinearProgressIndicator(
+                        value: uploadProgress,
+                        backgroundColor: Colors.grey[200], 
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                      )
+                    : Container(
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        child: Card(
+                          child: ListTile(
+                            title: Text(
+                              'Selected file: ${pickedFile!.name}',
+                              textAlign: TextAlign.center,
+                            ),
+                            onTap: showSelectedFile,
                           ),
-                          onTap: showSelectedFile,
                         ),
-                      ),
-                    ))
+                      ))
               : Container(
                   width: MediaQuery.of(context).size.width * 0.8,
                   child: const Card(
@@ -589,59 +593,145 @@ class _HistoryPageState extends State<HistoryPage> {
                 stream: getDocumentStream(),
                 builder: (context, snapshot) {
                   List<QueryDocumentSnapshot> documents = snapshot.data?.docs ?? [];
-  
+
                   if (documents.isEmpty) {
                     return Text('No files found with current filters.');
                   }
-  
+
                   return Column(
                     children: documents.map((doc) {
                       String imageName = doc['title'];
                       String documentID = doc.id; // reference in case of deleting
                       String imageURL = doc['imageURL']; // reference in case of deleting
-  
-                      return Card(
-                        child: ListTile(
-                          title: Text('$imageName'),
-                          onTap: () {
-                            showFile(doc);
-                          },
-                          trailing: IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () async {
-                              bool deletionConfirmation = await showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    content: Text('Are you sure you want to delete this file?'),
-                                    actions: [
-                                      TextButton(
-                                        child: Text('Cancel'),
-                                        onPressed: () {
-                                          Navigator.of(context).pop(false);
-                                        },
-                                      ),
-                                      TextButton(
-                                        child: Text('Delete'),
-                                        onPressed: () {
-                                          Navigator.of(context).pop(true);
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-  
-                              if (deletionConfirmation == true) {
-                                await db.collection("images").doc(documentID).delete();
-                                await FirebaseStorage.instance.refFromURL(imageURL).delete();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('File Deleted'),
+
+                      TextEditingController textEditingController = TextEditingController();
+
+                      return Dismissible(
+                        key: UniqueKey(), 
+                        direction: DismissDirection.endToStart,
+                        confirmDismiss: (direction) async {
+                          return await showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                content: Text('Are you sure you want to delete this file?'),
+                                actions: [
+                                  TextButton(
+                                    child: Text('Cancel'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop(false);
+                                    },
                                   ),
-                                );
-                              }
+                                  TextButton(
+                                    child: Text('Delete'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop(true);
+                                    },
+                                  ),
+                                ],
+                              );
                             },
+                          );
+                        },
+                        onDismissed: (direction) async {
+                          await db.collection("images").doc(documentID).delete();
+                          await FirebaseStorage.instance.refFromURL(imageURL).delete();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('File Deleted'),
+                            ),
+                          );
+                        },
+                        background: Container(
+                          color: Colors.red,
+                          child: const ListTile(
+                            leading: Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        child: Card(
+                          child: ListTile(
+                            title: Text('$imageName'),
+                            onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: ((context) =>
+                                        HistoryPageView(doc: doc))));
+                          },
+                            trailing: IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    TextEditingController textEditingController = TextEditingController();
+
+                                    String oldTitle = doc['title'];
+                                    String datePart = "";
+                                    bool foundDatePart = false;
+
+                                    for (int i = 0; i < oldTitle.length; i++) {
+                                      if (oldTitle[i].contains(RegExp(r'[0-9]'))) {
+                                        foundDatePart = true;
+                                      }
+
+                                      if (foundDatePart) {
+                                        datePart += oldTitle[i];
+                                      }
+                                    }
+
+                                    return AlertDialog(
+                                      title: Text('Editing sample water source...'),
+                                      content: TextField(
+                                        controller: textEditingController,
+                                        decoration: InputDecoration(
+                                          hintText: 'Enter new water source...',
+                                        ),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          child: Text('Cancel'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: Text('Save'),
+                                          onPressed: () async {
+                                            String newLocation = textEditingController.text;
+                                            if (newLocation.isNotEmpty) {
+                                              Navigator.of(context).pop();
+
+                                              String newTitle = '$newLocation $datePart';
+
+                                              await db.collection("images").doc(doc.id).update({
+                                                    'lake': newLocation,
+                                                    'title': newTitle,
+                                                  });
+
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('Location and title updated!'),
+                                                ),
+                                              );
+                                            } else {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('Please enter a valid location.'),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
                           ),
                         ),
                       );

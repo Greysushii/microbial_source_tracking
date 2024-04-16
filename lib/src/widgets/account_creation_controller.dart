@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:microbial_source_tracking/src/auth/auth_page.dart';
-import 'package:microbial_source_tracking/src/home/home_view.dart';
 
 FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -424,7 +423,7 @@ class RegisterState extends State<Register> {
           },
           child: Container(
             padding: const EdgeInsets.all(15),
-            margin: const EdgeInsets.symmetric(horizontal: 50),
+            margin: const EdgeInsets.symmetric(horizontal: 30),
             decoration: BoxDecoration(
                 color: const Color.fromARGB(255, 52, 52, 52),
                 borderRadius: BorderRadius.circular(8)),
