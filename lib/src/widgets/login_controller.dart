@@ -3,7 +3,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:microbial_source_tracking/src/auth/auth_page.dart';
-import 'package:microbial_source_tracking/src/home/home_view.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -102,7 +101,7 @@ class _LoginState extends State<Login> {
                       borderSide: BorderSide(color: Colors.grey)),
                   fillColor: Colors.white,
                   filled: true,
-                  hintText: "Enter Email...",
+                  hintText: "Enter email",
                 ),
               ),
             ),
@@ -122,7 +121,7 @@ class _LoginState extends State<Login> {
                       borderSide: BorderSide(color: Colors.grey)),
                   fillColor: Colors.white,
                   filled: true,
-                  hintText: "Enter password...",
+                  hintText: "Enter password",
                   //Show/hide contents of "Confirm password"
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -160,7 +159,7 @@ class _LoginState extends State<Login> {
               onTap: (signUserIn),
               child: Container(
                 padding: const EdgeInsets.all(15),
-                margin: const EdgeInsets.symmetric(horizontal: 100),
+                margin: const EdgeInsets.symmetric(horizontal: 30),
                 decoration: BoxDecoration(
                     color: const Color.fromARGB(255, 52, 52, 52),
                     borderRadius: BorderRadius.circular(8)),
@@ -168,7 +167,7 @@ class _LoginState extends State<Login> {
                     child: Text(
                   'Sign in',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 18,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),

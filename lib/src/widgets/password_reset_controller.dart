@@ -93,7 +93,7 @@ class PasswordResetState extends State<PasswordReset> {
                     borderSide: BorderSide(color: Colors.grey)),
                 fillColor: Colors.white,
                 filled: true,
-                hintText: "Enter Email",
+                hintText: "Enter email",
               ),
               //Hints telling user what is missing.
               autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -123,7 +123,7 @@ class PasswordResetState extends State<PasswordReset> {
           },
           child: Container(
             padding: const EdgeInsets.all(15),
-            margin: const EdgeInsets.symmetric(horizontal: 50),
+            margin: const EdgeInsets.symmetric(horizontal: 30),
             decoration: BoxDecoration(
                 color: const Color.fromARGB(255, 52, 52, 52),
                 borderRadius: BorderRadius.circular(8)),
@@ -131,7 +131,7 @@ class PasswordResetState extends State<PasswordReset> {
                 child: Text(
               'Send password reset',
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 18,
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),

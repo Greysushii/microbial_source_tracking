@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:geolocator_android/geolocator_android.dart';
+import 'package:microbial_source_tracking/src/history/history_page_view.dart';
 import 'package:permission_handler/permission_handler.dart';
  
 class HistoryPage extends StatefulWidget {
@@ -654,8 +655,12 @@ class _HistoryPageState extends State<HistoryPage> {
                           child: ListTile(
                             title: Text('$imageName'),
                             onTap: () {
-                              showFile(doc);
-                            },
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: ((context) =>
+                                        HistoryPageView(doc: doc))));
+                          },
                             trailing: IconButton(
                               icon: Icon(Icons.edit),
                               onPressed: () {
