@@ -11,6 +11,8 @@ import 'package:geolocator_android/geolocator_android.dart';
 import 'package:microbial_source_tracking/src/history/history_page_view.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+// This file handles all the code for the history page, where files can be uploaded and viewed.
+
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
 
@@ -20,7 +22,8 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   final db = FirebaseFirestore.instance; // Cloud firestore instance!
-  List<String> cachedUserOptions = [];
+  List<String> cachedUserOptions =
+      []; // this will store initialized filtering options
   List<String> cachedLakeOptions = [];
 
   PlatformFile? pickedFile;
@@ -28,12 +31,13 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   void initState() {
     super.initState();
-    fetchUserOptions();
+    fetchUserOptions(); // this will initialize filtering options when the app first launches, so it doesnt read from the Database every time the user tries to filter
     fetchLakeOptions();
   }
 
   Future selectFile() async {
-    final result = await FilePicker.platform.pickFiles();
+    final result = await FilePicker.platform
+        .pickFiles(); // for selecting a file from local storage
     if (result == null) return;
     setState(() {
       pickedFile = result.files.first;
@@ -45,11 +49,13 @@ class _HistoryPageState extends State<HistoryPage> {
     });
   }
 
-  double uploadProgress = 0.0;
+  double uploadProgress =
+      0.0; // upload progress for the progress bar, which increases in correlation to bytes transfered to the database
 
   Future uploadFile() async {
     bool serviceEnabled;
-    LocationPermission permission;
+    LocationPermission
+        permission; // permissions for accessing device location for android/ios. to record latitude/longitutde metadata
 
     // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -82,73 +88,86 @@ class _HistoryPageState extends State<HistoryPage> {
 
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
+    if (pickedFile == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Select a file first.'),
+        ),
+      );
+    }
 
-    final path = 'images/${pickedFile!.name}';
-    final file = File(pickedFile!.path!);
+    if (pickedFile != null) {
+      final path = 'images/${pickedFile!.name}';
+      final file = File(pickedFile!.path!);
 
-    String? waterSource = await getWaterSource();
+      String? waterSource = await getWaterSource();
 
-    if (waterSource != null) {
-      final ref = FirebaseStorage.instance.ref().child(path);
-
-      setState(() {
-        uploadProgress = 0.0;
-      });
-
-      final task = ref.putFile(file);
-
-      task.snapshotEvents.listen((TaskSnapshot snapshot) {
-        setState(() {
-          uploadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
-        });
-      });
-
-      await task; //must wait for firebase storage upload to complete first before grabbing downloadURL for cloud firestore document field
-
-      String currentUserEmail = FirebaseAuth.instance.currentUser?.email ?? "";
-
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .where('email', isEqualTo: currentUserEmail)
-          .get();
-      DocumentSnapshot currentUserInfo = querySnapshot.docs.first;
-
-      String uploadedDate = DateFormat('MM-dd-yyyy').format(actualDate);
-
-      var userLocation = await Geolocator.getCurrentPosition();
-
-      final image = <String, dynamic>{
-        "title": '$waterSource $uploadedDate',
-        "uploadedDate": FieldValue.serverTimestamp(),
-        "imageURL": await ref.getDownloadURL(),
-        "lake": waterSource,
-        "uploader's email": currentUserEmail,
-        "uploader's first name": currentUserInfo['firstname'],
-        "uploader's last name": currentUserInfo['lastname'],
-        "latitude": userLocation.latitude,
-        "longitude": userLocation.longitude,
-      };
-
-      await db.collection("images").add(image).then((DocumentReference doc) {
-        print('DocumentSnapshot added with ID: ${doc.id}');
+      if (waterSource != null) {
+        final ref = FirebaseStorage.instance.ref().child(path);
 
         setState(() {
-          pickedFile = null;
           uploadProgress = 0.0;
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('File Uploaded!'),
-          ),
-        );
-      });
-    }
+        final task = ref.putFile(file);
 
-    print(Geolocator.getCurrentPosition());
+        task.snapshotEvents.listen((TaskSnapshot snapshot) {
+          setState(() {
+            uploadProgress = snapshot.bytesTransferred /
+                snapshot.totalBytes; // progress bar for uploading file
+          });
+        });
+
+        await task; //must wait for firebase storage upload to complete first before grabbing downloadURL for cloud firestore document field
+
+        String currentUserEmail =
+            FirebaseAuth.instance.currentUser?.email ?? "";
+
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: currentUserEmail)
+            .get(); // finds the user document corresponding to the currently-logged-in user
+        DocumentSnapshot currentUserInfo = querySnapshot.docs.first;
+
+        String uploadedDate = DateFormat('MM-dd-yyyy').format(actualDate);
+
+        var userLocation = await Geolocator.getCurrentPosition();
+
+        final image = <String, dynamic>{
+          // uploaded document and its fields
+          "title": '$waterSource $uploadedDate',
+          "uploadedDate": FieldValue.serverTimestamp(),
+          "imageURL": await ref.getDownloadURL(),
+          "lake": waterSource,
+          "uploader's email": currentUserEmail,
+          "uploader's first name": currentUserInfo['firstname'],
+          "uploader's last name": currentUserInfo['lastname'],
+          "latitude": userLocation.latitude,
+          "longitude": userLocation.longitude,
+        };
+
+        await db.collection("images").add(image).then((DocumentReference doc) {
+          print('DocumentSnapshot added with ID: ${doc.id}');
+
+          setState(() {
+            pickedFile = null;
+            uploadProgress = 0.0;
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('File Uploaded!'),
+            ),
+          );
+        });
+      }
+
+      print(Geolocator.getCurrentPosition());
+    }
   }
 
   Future getWaterSource() async {
+    // function for getting the water source AKA lake name from the user. needed bc GPS will provide latitude/longitude but not actual lake name.
     TextEditingController waterSourceController = TextEditingController();
 
     return showDialog<String>(
@@ -217,6 +236,7 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Future showSelectedFile() async {
+    // shows selected file for preview before user decides to upload it to make sure its the right file
     if (pickedFile != null) {
       File file = File(pickedFile!.path!);
 
@@ -231,10 +251,12 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
-  List<String> selectedLakes = [];
+  List<String> selectedLakes =
+      []; // these variables hold the user's selected filtering options
   List<String> selectedUsers = [];
 
   Future fetchUserOptions() async {
+    // see comment on Line 32
     if (cachedUserOptions.isEmpty) {
       QuerySnapshot userQuery = await FirebaseFirestore.instance
           .collection('users')
@@ -261,58 +283,64 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Future openUserOptions() async {
+    // opens checklist of all the Users registered to the app so the user can filter the data by Username of Uploader
     await fetchUserOptions();
 
-    bool result = await showDialog(
+    bool? result = await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return SimpleDialog(
-          title: Text('Select Users'),
-          children: [
-            SingleChildScrollView(
-              child: StatefulBuilder(
-                builder: (BuildContext context, StateSetter setState) {
-                  return Column(
-                    children: cachedUserOptions.map((user) {
-                      return CheckboxListTile(
-                        title: Text(user),
-                        value: selectedUsers.contains(user),
-                        onChanged: (value) {
-                          setState(() {
-                            if (value!) {
-                              selectedUsers.add(user);
-                            } else {
-                              selectedUsers.remove(user);
-                            }
-                          });
-                        },
-                      );
-                    }).toList(),
-                  );
-                },
+        return GestureDetector(
+          onTap: () {
+            Navigator.of(context).pop(false); // Close the dialog on tap outside
+          },
+          child: SimpleDialog(
+            title: Text('Select Users'),
+            children: [
+              SingleChildScrollView(
+                child: StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return Column(
+                      children: cachedUserOptions.map((user) {
+                        return CheckboxListTile(
+                          title: Text(user),
+                          value: selectedUsers.contains(user),
+                          onChanged: (value) {
+                            setState(() {
+                              if (value!) {
+                                selectedUsers.add(user);
+                              } else {
+                                selectedUsers.remove(user);
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  child: Text('Cancel'),
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                ),
-                TextButton(
-                  child: Text('Done'),
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                    setState(() {
-                      selectedLakes = [];
-                    });
-                  },
-                ),
-              ],
-            ),
-          ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    child: Text('Cancel'),
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                  ),
+                  TextButton(
+                    child: Text('Done'),
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                      setState(() {
+                        selectedLakes = [];
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
         );
       },
     );
@@ -323,58 +351,64 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Future openLakeOptions() async {
+    // opens checklist of all the Locations registered to the app so the user can filter the data by Location
     await fetchLakeOptions();
 
-    bool result = await showDialog(
+    bool? result = await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return SimpleDialog(
-          title: Text('Select Location'),
-          children: [
-            SingleChildScrollView(
-              child: StatefulBuilder(
-                builder: (BuildContext context, StateSetter setState) {
-                  return Column(
-                    children: cachedLakeOptions.map((lake) {
-                      return CheckboxListTile(
-                        title: Text(lake),
-                        value: selectedLakes.contains(lake),
-                        onChanged: (value) {
-                          setState(() {
-                            if (value!) {
-                              selectedLakes.add(lake);
-                            } else {
-                              selectedLakes.remove(lake);
-                            }
-                          });
-                        },
-                      );
-                    }).toList(),
-                  );
-                },
+        return GestureDetector(
+          onTap: () {
+            Navigator.of(context).pop(false); // Close the dialog on tap outside
+          },
+          child: SimpleDialog(
+            title: Text('Select Location'),
+            children: [
+              SingleChildScrollView(
+                child: StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return Column(
+                      children: cachedLakeOptions.map((lake) {
+                        return CheckboxListTile(
+                          title: Text(lake),
+                          value: selectedLakes.contains(lake),
+                          onChanged: (value) {
+                            setState(() {
+                              if (value!) {
+                                selectedLakes.add(lake);
+                              } else {
+                                selectedLakes.remove(lake);
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  child: Text('Cancel'),
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                ),
-                TextButton(
-                  child: Text('Done'),
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                    setState(() {
-                      selectedUsers = [];
-                    });
-                  },
-                ),
-              ],
-            ),
-          ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    child: Text('Cancel'),
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                  ),
+                  TextButton(
+                    child: Text('Done'),
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                      setState(() {
+                        selectedUsers = [];
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
         );
       },
     );
@@ -388,9 +422,11 @@ class _HistoryPageState extends State<HistoryPage> {
       .now(); // using DateTime class to grab current date, which can be modified in the DatePicker below for filtering purposes
   DateTime actualDate = DateTime.now();
 
-  bool showAllDates = true;
+  bool showAllDates =
+      true; // changes based on whether a date is selected or not for data filtering
 
   Stream<QuerySnapshot> getDocumentStream() {
+    // StreamBuilder (located lower in this file) listens to Stream (this function). Stream changes the documents viewable on the user's feed based on their selected filters.
     DateTime start =
         DateTime(currentDate.year, currentDate.month, currentDate.day);
     DateTime end = start.add(Duration(days: 1));
@@ -400,16 +436,17 @@ class _HistoryPageState extends State<HistoryPage> {
     if (!showAllDates) {
       collectionQuery = collectionQuery
           .where('uploadedDate', isGreaterThanOrEqualTo: start)
-          .where('uploadedDate', isLessThan: end);
+          .where('uploadedDate', isLessThan: end); // Handles date filtering
     }
 
     if (selectedLakes.isNotEmpty) {
-      collectionQuery = collectionQuery.where('lake', whereIn: selectedLakes);
+      collectionQuery = collectionQuery.where('lake',
+          whereIn: selectedLakes); // handles location filtering
     }
 
     if (selectedUsers.isNotEmpty) {
-      collectionQuery =
-          collectionQuery.where('uploader\'s email', whereIn: selectedUsers);
+      collectionQuery = collectionQuery.where('uploader\'s email',
+          whereIn: selectedUsers); // handles User filtering
     }
 
     collectionQuery = collectionQuery.orderBy('uploadedDate', descending: true);
@@ -510,6 +547,7 @@ class _HistoryPageState extends State<HistoryPage> {
                           ]),
                           onPressed: () async {
                             DateTime? pickedDate = await showDatePicker(
+                              // Selecting Date filtering option opens up calendar to pick date
                               context: context,
                               initialDate: currentDate,
                               firstDate: DateTime(2000),
@@ -553,7 +591,8 @@ class _HistoryPageState extends State<HistoryPage> {
                     ),
                   ),
                   TextButton(
-                    child: Text('Reset'),
+                    child: Text(
+                        'Reset'), //Restting filters sets everything back to default
                     onPressed: () {
                       setState(() {
                         showAllDates = true;
@@ -591,6 +630,7 @@ class _HistoryPageState extends State<HistoryPage> {
                           TextEditingController();
 
                       return Dismissible(
+                        // Swipe-to-Delete: Each item can be swiped to delete it
                         key: UniqueKey(),
                         direction: DismissDirection.endToStart,
                         confirmDismiss: (direction) async {
@@ -623,9 +663,6 @@ class _HistoryPageState extends State<HistoryPage> {
                               .collection("images")
                               .doc(documentID)
                               .delete();
-                          await FirebaseStorage.instance
-                              .refFromURL(imageURL)
-                              .delete();
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('File Deleted'),
@@ -648,8 +685,9 @@ class _HistoryPageState extends State<HistoryPage> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: ((context) =>
-                                          HistoryPageView(doc: doc))));
+                                      builder: ((context) => HistoryPageView(
+                                          doc:
+                                              doc)))); // routes to another page to display the selected file's information
                             },
                             trailing: IconButton(
                               icon: Icon(Icons.edit),
@@ -661,14 +699,17 @@ class _HistoryPageState extends State<HistoryPage> {
                                         textEditingController =
                                         TextEditingController();
 
-                                    String oldTitle = doc['title'];
+                                    String oldTitle = doc[
+                                        'title']; // Changing the 'lake' field and title of a document/file, in case of an error or typo.
                                     String datePart = "";
                                     bool foundDatePart = false;
 
                                     for (int i = 0; i < oldTitle.length; i++) {
                                       if (oldTitle[i]
                                           .contains(RegExp(r'[0-9]'))) {
-                                        foundDatePart = true;
+                                        // Since the title of each file is "Lake Name MM-DD-YYYY", a concatenation of 2 strings (lake string and date string), but only the Lake string needs to be edited,
+                                        foundDatePart =
+                                            true; // due to the original date needing to stay the same, this iterates the string until a numerical value is reached, after which the date portion of the title is saved and combined with the user-inputted new lake/location name.
                                       }
 
                                       if (foundDatePart) {
@@ -678,11 +719,11 @@ class _HistoryPageState extends State<HistoryPage> {
 
                                     return AlertDialog(
                                       title: Text(
-                                          'Editing sample water source...'),
+                                          'Edit sample location:'), // user input for editing file location
                                       content: TextField(
                                         controller: textEditingController,
                                         decoration: InputDecoration(
-                                          hintText: 'Enter new water source...',
+                                          hintText: 'Enter new water source.',
                                         ),
                                       ),
                                       actions: [
@@ -715,7 +756,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                                   .showSnackBar(
                                                 const SnackBar(
                                                   content: Text(
-                                                      'Location and title updated!'),
+                                                      'Sample source and file name updated!'),
                                                 ),
                                               );
                                             } else {
@@ -723,7 +764,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                                   .showSnackBar(
                                                 const SnackBar(
                                                   content: Text(
-                                                      'Please enter a valid location.'),
+                                                      'Please enter a valid sample source.'),
                                                 ),
                                               );
                                             }
