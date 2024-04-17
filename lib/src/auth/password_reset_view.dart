@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:microbial_source_tracking/src/login/login_view.dart';
 import '../widgets/password_reset_controller.dart';
 
 class PasswordResetView extends StatelessWidget {
@@ -10,6 +9,9 @@ class PasswordResetView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 233, 248, 255),
+      ),
       backgroundColor: const Color.fromARGB(255, 233, 248, 255),
       body: SingleChildScrollView(
         child: SafeArea(
@@ -17,47 +19,36 @@ class PasswordResetView extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(8.0),
               child: Column(
-                children: const [
-                  SizedBox(height: 50),
-                  Text(
-                    'Enter your email to send a password reset',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500),
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 30),
+                    child: Text(
+                      'Forgot your password?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+
+                  SizedBox(height: 10),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 30),
+                    child: Text(
+                      'Enter your email to receive a password reset link.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.black, fontSize: 18),
+                    ),
                   ),
                   SizedBox(height: 15),
 
-                  //Register widget
+                  // Password reset widget
                   PasswordReset(),
                   SizedBox(height: 20),
                 ],
               )),
         ),
-      ),
-      bottomNavigationBar: Container(
-        height: 50,
-        alignment: Alignment.topCenter,
-        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          const Text('', style: TextStyle(fontSize: 20)),
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const LoginView(),
-                ),
-              );
-            },
-            child: const Text(
-              'Return to login',
-              style: TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20),
-            ),
-          )
-        ]),
       ),
     );
   }
