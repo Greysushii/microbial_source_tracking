@@ -10,8 +10,10 @@ import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:geolocator_android/geolocator_android.dart';
 import 'package:microbial_source_tracking/src/history/history_page_view.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+// This file handles all the code for the history page, where files can be uploaded and viewed. 
  
-class HistoryPage extends StatefulWidget {
+class HistoryPage extends StatefulWidget { 
   const HistoryPage({super.key});
  
   @override
@@ -276,139 +278,139 @@ class _HistoryPageState extends State<HistoryPage> {
   }
  
     Future openUserOptions() async { // opens checklist of all the Users registered to the app so the user can filter the data by Username of Uploader
-  await fetchUserOptions();
+      await fetchUserOptions();
 
-  bool? result = await showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return GestureDetector(
-        onTap: () {
-          Navigator.of(context).pop(false); // Close the dialog on tap outside
-        },
-        child: SimpleDialog(
-          title: Text('Select Users'),
-          children: [
-            SingleChildScrollView(
-              child: StatefulBuilder(
-                builder: (BuildContext context, StateSetter setState) {
-                  return Column(
-                    children: cachedUserOptions.map((user) {
-                      return CheckboxListTile(
-                        title: Text(user),
-                        value: selectedUsers.contains(user),
-                        onChanged: (value) {
-                          setState(() {
-                            if (value!) {
-                              selectedUsers.add(user);
-                            } else {
-                              selectedUsers.remove(user);
-                            }
-                          });
-                        },
-                      );
-                    }).toList(),
-                  );
-                },
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+      bool? result = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return GestureDetector(
+            onTap: () {
+              Navigator.of(context).pop(false); // Close the dialog on tap outside
+            },
+            child: SimpleDialog(
+              title: Text('Select Users'),
               children: [
-                TextButton(
-                  child: Text('Cancel'),
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
+                SingleChildScrollView(
+                  child: StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setState) {
+                      return Column(
+                        children: cachedUserOptions.map((user) {
+                          return CheckboxListTile(
+                            title: Text(user),
+                            value: selectedUsers.contains(user),
+                            onChanged: (value) {
+                              setState(() {
+                                if (value!) {
+                                  selectedUsers.add(user);
+                                } else {
+                                  selectedUsers.remove(user);
+                                }
+                              });
+                            },
+                          );
+                        }).toList(),
+                      );
+                    },
+                  ),
                 ),
-                TextButton(
-                  child: Text('Done'),
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                    setState(() {
-                      selectedLakes = [];
-                    });
-                  },
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      child: Text('Cancel'),
+                      onPressed: () {
+                        Navigator.of(context).pop(false);
+                      },
+                    ),
+                    TextButton(
+                      child: Text('Done'),
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                        setState(() {
+                          selectedLakes = [];
+                        });
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
+          );
+        },
       );
-    },
-  );
 
-  if (result != null && result) {
-    print('Selected Users: $selectedUsers');
-  }
-}
+      if (result != null && result) {
+        print('Selected Users: $selectedUsers');
+      }
+    }
 
  
     Future openLakeOptions() async { // opens checklist of all the Locations registered to the app so the user can filter the data by Location
-  await fetchLakeOptions();
+      await fetchLakeOptions();
 
-  bool? result = await showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return GestureDetector(
-        onTap: () {
-          Navigator.of(context).pop(false); // Close the dialog on tap outside
-        },
-        child: SimpleDialog(
-          title: Text('Select Location'),
-          children: [
-            SingleChildScrollView(
-              child: StatefulBuilder(
-                builder: (BuildContext context, StateSetter setState) {
-                  return Column(
-                    children: cachedLakeOptions.map((lake) {
-                      return CheckboxListTile(
-                        title: Text(lake),
-                        value: selectedLakes.contains(lake),
-                        onChanged: (value) {
-                          setState(() {
-                            if (value!) {
-                              selectedLakes.add(lake);
-                            } else {
-                              selectedLakes.remove(lake);
-                            }
-                          });
-                        },
-                      );
-                    }).toList(),
-                  );
-                },
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+      bool? result = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return GestureDetector(
+            onTap: () {
+              Navigator.of(context).pop(false); // Close the dialog on tap outside
+            },
+            child: SimpleDialog(
+              title: Text('Select Location'),
               children: [
-                TextButton(
-                  child: Text('Cancel'),
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
+                SingleChildScrollView(
+                  child: StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setState) {
+                      return Column(
+                        children: cachedLakeOptions.map((lake) {
+                          return CheckboxListTile(
+                            title: Text(lake),
+                            value: selectedLakes.contains(lake),
+                            onChanged: (value) {
+                              setState(() {
+                                if (value!) {
+                                  selectedLakes.add(lake);
+                                } else {
+                                  selectedLakes.remove(lake);
+                                }
+                              });
+                            },
+                          );
+                        }).toList(),
+                      );
+                    },
+                  ),
                 ),
-                TextButton(
-                  child: Text('Done'),
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                    setState(() {
-                      selectedUsers = [];
-                    });
-                  },
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      child: Text('Cancel'),
+                      onPressed: () {
+                        Navigator.of(context).pop(false);
+                      },
+                    ),
+                    TextButton(
+                      child: Text('Done'),
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                        setState(() {
+                          selectedUsers = [];
+                        });
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
+          );
+        },
       );
-    },
-  );
 
-  if (result != null && result) {
-    print('Selected Lakes: $selectedLakes');
-  }
-}
+      if (result != null && result) {
+        print('Selected Lakes: $selectedLakes');
+      }
+    }
 
   
     DateTime currentDate = DateTime.now(); // using DateTime class to grab current date, which can be modified in the DatePicker below for filtering purposes
