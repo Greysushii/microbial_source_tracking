@@ -1,9 +1,12 @@
-import 'dart:async';
+// ignore_for_file: prefer_const_constructors
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:microbial_source_tracking/src/login/login_view.dart';
 
+/*This file handles changing the user's password by clicking "Forgot password?"
+  on the login screen.*/
 class PasswordReset extends StatefulWidget {
   const PasswordReset({
     super.key,
@@ -19,13 +22,18 @@ class PasswordResetState extends State<PasswordReset> {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException {
-      //throw Exception(err.message.toString());
       alertMessage(7);
     } catch (err) {
       throw Exception(err.toString());
     }
   }
 
+/*alertMessage returns a message based on the users inputs in the form of an issue
+  issue starts at 6 as a continuation from alertMessage from account_creation_controller-
+  the methods do not interact, I just prefered the consistency for continuing from 5.
+  
+  6: Email field has been filled
+  7: Email field has not been filled correctly (missing . and/or @)*/
   Future<void> alertMessage(int issue) async {
     String issueTitle = " ";
     String issueContent = " ";
@@ -33,7 +41,7 @@ class PasswordResetState extends State<PasswordReset> {
 
     switch (issue) {
       case 6:
-        issueTitle = "Password reset sent";
+        issueTitle = "Password reset email sent";
         issueContent =
             "If ${userEmail.text} exists within our database, a password reset link will appear in your inbox.";
         textForButton = "Return to login";
@@ -45,7 +53,8 @@ class PasswordResetState extends State<PasswordReset> {
 
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // user must tap button!
+      barrierDismissible:
+          false, //the "textForButton" value must be pressed to close the alert
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(issueTitle, style: TextStyle(fontSize: 25)),
@@ -56,10 +65,13 @@ class PasswordResetState extends State<PasswordReset> {
                 if (issue == 6) {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => LoginView()),
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            LoginView()), //return the user to the login page
                   );
                 } else {
-                  Navigator.of(context).pop();
+                  Navigator.of(context)
+                      .pop(); //return the user to the forgot password page as they failed to fill in the email field
                 }
               },
               child: Text(textForButton, style: TextStyle(fontSize: 20)),

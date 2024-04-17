@@ -30,7 +30,7 @@ dependencies:
   flutter_gen: any
   cloud_firestore: ^4.15.6
   location: ^5.0.3
-  firebase_dynamic_links: ^5.4.17
+  firebase_dynamic_links: ^5.4.18
   firebase_admin: ^0.2.0
 dev_dependencies:
   flutter_test:
