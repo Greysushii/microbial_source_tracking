@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:microbial_source_tracking/src/themes/glwa_theme.dart';
 
+/* 
+  HistoryPageView organizes a specific image's information on a new page.
+*/
+
 class HistoryPageView extends StatelessWidget {
   final QueryDocumentSnapshot doc;
 
@@ -10,6 +14,7 @@ class HistoryPageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Image's metadata is stored in variables
     String imageName = doc['title'];
     String imageURL = doc['imageURL'];
     String uploaderEmail = doc["uploader's email"];
@@ -55,6 +60,7 @@ class HistoryPageView extends StatelessWidget {
                   SizedBox(
                     child: Column(
                       children: [
+                        // Metadata organized into individual cards
                         buildMetadataCard(
                             title: 'Coordinates',
                             value: '($latitude, $longitude)'),

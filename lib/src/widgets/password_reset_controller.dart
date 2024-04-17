@@ -57,8 +57,8 @@ class PasswordResetState extends State<PasswordReset> {
           false, //the "textForButton" value must be pressed to close the alert
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(issueTitle, style: TextStyle(fontSize: 25)),
-          content: Text(issueContent, style: TextStyle(fontSize: 16)),
+          title: Text(issueTitle, style: const TextStyle(fontSize: 25)),
+          content: Text(issueContent, style: const TextStyle(fontSize: 16)),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -74,7 +74,7 @@ class PasswordResetState extends State<PasswordReset> {
                       .pop(); //return the user to the forgot password page as they failed to fill in the email field
                 }
               },
-              child: Text(textForButton, style: TextStyle(fontSize: 20)),
+              child: Text(textForButton, style: const TextStyle(fontSize: 20)),
             ),
           ],
         );

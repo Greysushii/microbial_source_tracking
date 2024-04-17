@@ -3,6 +3,10 @@
 import 'package:flutter/material.dart';
 import '../widgets/password_reset_controller.dart';
 
+/*
+  PasswordResetView creates the page view for resetting the user's password.
+*/
+
 class PasswordResetView extends StatelessWidget {
   const PasswordResetView({super.key});
 
