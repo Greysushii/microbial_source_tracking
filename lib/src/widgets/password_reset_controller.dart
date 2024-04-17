@@ -48,21 +48,21 @@ class PasswordResetState extends State<PasswordReset> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(issueTitle, style: TextStyle(fontSize: 25)),
-          content: Text(issueContent, style: TextStyle(fontSize: 16)),
+          title: Text(issueTitle, style: const TextStyle(fontSize: 25)),
+          content: Text(issueContent, style: const TextStyle(fontSize: 16)),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 if (issue == 6) {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => LoginView()),
+                    MaterialPageRoute(builder: (context) => const LoginView()),
                   );
                 } else {
                   Navigator.of(context).pop();
                 }
               },
-              child: Text(textForButton, style: TextStyle(fontSize: 20)),
+              child: Text(textForButton, style: const TextStyle(fontSize: 20)),
             ),
           ],
         );
