@@ -15,7 +15,7 @@ class HowToFiles extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: glwaTheme.secondaryHeaderColor,
       ),
-      body: SafeArea(
+      body: SingleChildScrollView(
         child: Column(
           children: [
             const Padding(

@@ -30,22 +30,22 @@ class NavBar extends StatelessWidget {
             child: Row(
               children: [
                 navItem( //Home Button
-                  Icons.home_outlined,
+                  Icons.home_filled,
                   pageIndex == 0,
                   onTap: () => onTap(0),
                 ),
                 navItem( //IoT Device Configuration Button
-                  Icons.build_circle_outlined,
+                  Icons.build_circle,
                   pageIndex == 1,
                   onTap: () => onTap(1),
                 ),
                 navItem( //History Button
-                  Icons.folder_outlined,
+                  Icons.drive_folder_upload_rounded,
                   pageIndex == 2,
                   onTap: () => onTap(2),
                 ),
                 navItem( //Account and Settings Button
-                  Icons.settings_applications_outlined,
+                  Icons.settings_applications_sharp,
                   pageIndex == 3,
                   onTap: () => onTap(3),
                 ),  
