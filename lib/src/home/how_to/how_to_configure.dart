@@ -1,6 +1,11 @@
 import "package:flutter/material.dart";
 import "package:microbial_source_tracking/src/themes/glwa_theme.dart";
 
+/*
+  HowToConfigure displays the instructions on how to configure a device for
+  the purposes of the application.
+*/
+
 class HowToConfigure extends StatelessWidget {
   const HowToConfigure({super.key});
 

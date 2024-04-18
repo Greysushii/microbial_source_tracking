@@ -1,13 +1,16 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:microbial_source_tracking/src/auth/auth_page.dart';
 
+/*This file handles creation of the user's account for the purposes of tracking
+  who submitted a given test.*/
+
+//Initialize Firebase authentication
 FirebaseAuth auth = FirebaseAuth.instance;
 
 //Register is the name of this widget,
@@ -21,22 +24,25 @@ class Register extends StatefulWidget {
 }
 
 class RegisterState extends State<Register> {
-  //retrieve text from input
-//Save the user's email and password when entering
+//Save the first name, last name, email and password
   final userFirstName = TextEditingController();
   final userLastName = TextEditingController();
   final userEmail = TextEditingController();
   final userPass = TextEditingController();
   final userPassConfirm = TextEditingController();
 
-//Initial password requirement check. True if password field meets strength req
+/*Initial password requirement check. True if password field meets strength req
+  Strength req = Min of 8 characters, 1 capital, 1 lower, 1 number, 1 special
+  passConfirm returns true if both password fields match. 
+  both must return true to allow registration. 
+  uniqueEmail tests if the email entered is not already in the database. 
+  Initalized as true, set to false should the email already exist. Set to true
+  after registerUser is called without getting caught by the already exist check.*/
   bool passStrength = false;
-//Once both passwords match, this becomes true
   bool passConfirm = false;
-
   bool uniqueEmail = true;
 
-//Check if all the fields are filled
+//Check if all the fields are filled. If even one is empty, return false
   bool checkButton() {
     if ((userEmail.text.isEmpty |
         userFirstName.text.isEmpty |
@@ -48,6 +54,20 @@ class RegisterState extends State<Register> {
       return true;
     }
   }
+
+/*alertMessage returns a message based on the users inputs in the form of an issue
+  0: Default error message and template, unused
+  1: one or more fields were empty
+  2,3: Password issue, these both clear the password fields after being called
+  4: Email exists in the database already
+  5: Success, signs the user in and takes them to the home page
+ 
+  Case 0-4 will set the alert text button to "Return" for the user to try again
+  Case 5 changes the alert text button to "Home page"*
+  
+  *: The application routes to the authpage, this is used to effectively sign 
+  the user in. Once they log out, they are called back to it. On the user's side, 
+  they will go from the registration page to the home page.*/
 
   Future<void> alertMessage(int issue) async {
     String issueTitle = " ";
@@ -87,7 +107,8 @@ class RegisterState extends State<Register> {
 
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // user must tap button!
+      barrierDismissible:
+          false, //the "textForButton" value must be pressed to close the alert
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(issueTitle, style: TextStyle(fontSize: 25)),
@@ -98,10 +119,13 @@ class RegisterState extends State<Register> {
                 if (issue == 5) {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AuthPage()),
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            AuthPage()), //Sets the user to be logged in, then sends them to the home page
                   );
                 } else {
-                  Navigator.of(context).pop();
+                  Navigator.of(context)
+                      .pop(); //For any other issue, pressing the text button will return them to the registration page
                 }
               },
               child: Text(textForButton, style: TextStyle(fontSize: 20)),
@@ -112,22 +136,28 @@ class RegisterState extends State<Register> {
     );
   }
 
-//Error message that appears when creating a password, holds all the requirements
-//that slowly are removed as the strength requirements are met.
-  String _em = '';
-
 //For showing/hiding the passwords
   bool passVisible = true;
   bool confirmVisible = true;
 
-//Clears the passwords after not matching
+//Clears the password fields after not matching
   void clearPassword() {
     userPass.clear();
     userPassConfirm.clear();
   }
 
+/*Error message that appears when creating a password, holds all the requirements
+  that slowly are removed as the strength requirements are met.*/
+  String _em = '';
+
+/*strengthRequirements checks the password field if the password is:
+  between 8 and 20 characters and contains at minimum
+  One uppercase, lowcase, number, AND special character 
+  
+  Note: This only checks the initial password field, since confirm password
+  must be the same as the password field, so no second strength check needed */
   bool strengthRequirements(String userPass) {
-    //Reset error message
+    //Resets error message after user updates password field.
     _em = '';
     //Returns true if any of these values "fail"
     if (userPass.length < 8) {
@@ -152,12 +182,19 @@ class RegisterState extends State<Register> {
     return _em.isEmpty;
   }
 
+/*registerUser is called when the user presses 'Create account' after having
+  passed the password checks. userCredential attempts to add the email and password
+  to the Firebase, but if that email is already connected to a user, then issue 4
+  from alertMessage is called notifying the user that the email is in use. 
+  
+  If all checks pass, alertMessage(5) is called, where the email and password are stored
+  in Firebase. FirebaseFirestore handles adding first name, last name, and email
+  into user collections.*/
   Future<User?> registerUser(
       {required String uEmail,
       required String uPass,
       required BuildContext context}) async {
     try {
-      // ignore: unused_local_variable
       UserCredential userCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: uEmail,
@@ -173,7 +210,6 @@ class RegisterState extends State<Register> {
         'email': userEmail.text.trim().toLowerCase(),
       });
       FirebaseAuth.instance.currentUser?.sendEmailVerification();
-      //alertMessage(5);
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: uEmail,
         password: uPass,
@@ -299,7 +335,7 @@ class RegisterState extends State<Register> {
               controller: userPass,
               obscureText: passVisible,
               decoration: InputDecoration(
-                labelText: 'Password',
+                labelText: "Password",
                 hintText: "Enter password",
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -347,7 +383,7 @@ class RegisterState extends State<Register> {
               controller: userPassConfirm,
               obscureText: confirmVisible,
               decoration: InputDecoration(
-                labelText: 'Confirm password',
+                labelText: "Confirm password",
                 hintText: "Confirm password",
 
                 //Show/hide contents of "Confirm password"
@@ -377,11 +413,9 @@ class RegisterState extends State<Register> {
                   return null;
                 }
                 if (userPass.text != userPassConfirm.text) {
-                  if (kDebugMode) {}
                   passConfirm = false;
                 }
                 if (userPass.text == userPassConfirm.text) {
-                  if (kDebugMode) {}
                   passConfirm = true;
                 }
                 return null;
@@ -393,15 +427,11 @@ class RegisterState extends State<Register> {
         GestureDetector(
           onTap: () {
             setState(() {
-              //Check if the values are the same, and if the boxes are not empty
-              if (kDebugMode) {
-                print("Strength $passStrength \nConfirm $passConfirm \n");
-              }
-              //User entered nothing
+              //User entered nothing in one or more fields
               if (((checkButton()) == false)) {
                 alertMessage(1);
               }
-              //User entered a weak password. Reset password and try again
+              //User entered a weak password. Empty password fields and try again
               else if (((passStrength) == false)) {
                 alertMessage(2);
                 clearPassword();

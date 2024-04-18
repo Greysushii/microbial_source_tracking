@@ -1,6 +1,11 @@
 import "package:flutter/material.dart";
 import "package:microbial_source_tracking/src/themes/glwa_theme.dart";
 
+/*
+  HowToFiles displays the instructions on how to select and upload a file
+  from the device's local storage to the database.
+*/
+
 class HowToFiles extends StatelessWidget {
   const HowToFiles({super.key});
 

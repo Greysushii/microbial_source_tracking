@@ -1,6 +1,11 @@
 import "package:flutter/material.dart";
 import "package:microbial_source_tracking/src/themes/glwa_theme.dart";
 
+/*
+  HowToBluetooth displays the instructions on how to connect to a Bluetooth
+  device.
+*/
+
 class HowToBluetooth extends StatelessWidget {
   const HowToBluetooth({super.key});
 

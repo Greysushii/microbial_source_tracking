@@ -5,6 +5,12 @@ import 'package:microbial_source_tracking/src/widgets/login_controller.dart';
 
 import '../auth/password_reset_view.dart';
 
+/*
+  LoginView displays the login page of the application, which includes the
+  GLWA logo, login text, login widget, routing to the account creation page,
+  and routing to the reset password page.
+*/
+
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
 
@@ -38,6 +44,7 @@ class LoginView extends StatelessWidget {
 
                   const SizedBox(height: 20),
 
+                  // Account creation
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Row(

@@ -1,7 +1,14 @@
+// ignore_for_file: avoid_print, use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+/*
+  AccountData organizes the user's account data and allows the user to
+  edit their account data.
+*/
 
 class AccountData extends StatefulWidget {
   const AccountData({super.key});
@@ -25,6 +32,7 @@ class _AccountDataState extends State<AccountData> {
     newValue.clear();
   }
 
+  // Update user's data based on a specific field
   Future<void> updateUser(String field) {
     return FirebaseFirestore.instance
         .collection('users')
@@ -34,13 +42,14 @@ class _AccountDataState extends State<AccountData> {
         .catchError((error) => print('failed to update user: $error'));
   }
 
+  // Update user's email
   Future<void> updateEmail() async {
     try {
       String password = newValue.text.trim();
 
+      // Reauthenticate user credentials to change email
       AuthCredential credential =
           EmailAuthProvider.credential(email: user.email!, password: password);
-
       await user.reauthenticateWithCredential(credential);
 
       return showDialog(
@@ -107,10 +116,12 @@ class _AccountDataState extends State<AccountData> {
     }
   }
 
+  // Update user's password
   Future<void> updatePassword() async {
     try {
       String password = newValue.text.trim();
 
+      // Reauthenticate user credentials to change password
       AuthCredential credential =
           EmailAuthProvider.credential(email: user.email!, password: password);
 
@@ -173,7 +184,7 @@ class _AccountDataState extends State<AccountData> {
 
               return ListView(
                 children: [
-                  // user email
+                  // User email organized into an individual card
                   buildAccountDataCard(
                       title: 'Email',
                       value: userData['email'] ?? '',
@@ -216,7 +227,7 @@ class _AccountDataState extends State<AccountData> {
                             ),
                           )),
 
-                  // user first name
+                  // User first name organized into an individual card
                   buildAccountDataCard(
                       title: 'First name',
                       value: userData['firstname'] ?? '',
@@ -258,7 +269,7 @@ class _AccountDataState extends State<AccountData> {
                             ),
                           )),
 
-                  // user last name
+                  // User last name organized into an individual card
                   buildAccountDataCard(
                       title: 'Last name',
                       value: userData['lastname'] ?? '',
@@ -300,7 +311,7 @@ class _AccountDataState extends State<AccountData> {
                             ),
                           )),
 
-                  // password
+                  // Password organized into an individual card
                   buildAccountDataCard(
                       title: 'Password',
                       value: '********',
@@ -359,6 +370,8 @@ class _AccountDataState extends State<AccountData> {
         ));
   }
 
+  // buildAccountDataCard creates a container that holds given metadata fields
+  // and edit functionality
   Widget buildAccountDataCard(
       {required String title,
       required String value,

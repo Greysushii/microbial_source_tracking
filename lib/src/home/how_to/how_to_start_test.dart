@@ -1,6 +1,10 @@
 import "package:flutter/material.dart";
 import "package:microbial_source_tracking/src/themes/glwa_theme.dart";
 
+/*
+  HowToStartTest displays the instructions on how to start a test.
+*/
+
 class HowToStartTest extends StatelessWidget {
   const HowToStartTest({super.key});
 
