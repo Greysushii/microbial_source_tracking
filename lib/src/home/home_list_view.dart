@@ -25,7 +25,7 @@ class _HomeListViewState extends State<HomeListView> {
         appBar: AppBar(
           title: const Text("Home Page"),
         ),
-        body: SafeArea(
+        body: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
