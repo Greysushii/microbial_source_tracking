@@ -27,9 +27,51 @@ Department of Computer Science
 Wayne State University,<br />
 Department of Computer Science
 
+#### Notes From The Developers
+<details>
+<summary>File Structure</summary>
+    
+    In our codebase we opted for a specific file structure
+    to help with a request for scalability. You'll notice
+    a 'feature first' methodology. Meaning we broke the
+    features into seperate folders. Therefore the is some
+    explaining need for the following folders.
+
+<details>
+<summary>Widgets</summary>
+
+    Here is where we stored all built widgets that live
+    within a feature. These could be auto generated tile
+    cards, app bars, and controllers.
+
+
+</details>
+
+<details>
+<summary>Assets</summary>
+
+    Here we have stored all assests used in the project,
+    this is different from the screenshots folder. This
+    contains logos and icons used.
+
+
+</details>
+
+<details>
+<summary>Services</summary>
+
+    Since this application connects to an external IoT
+    device we needed a place to store this code. Here
+    will contain all the Python scripts and servers for
+    the IoT device.
+
+</details>
+
+</details>
+
 
 ## Device Compatibility
-<details open>
+<details>
 <summary>Versions</summary>
 
 - IOS: v11.0
@@ -142,7 +184,48 @@ Department of Computer Science
     
 </details>
 
+## Screenshots
+
+<details>
+<summary>Login / Registration</summary>
+
+<img src="Screenshots/Login Page(APP).png" alt="Login" width="180"/>
+<img src="" alt="Register" width="180"/>
+
+</details>
+
+<details>
+<summary>Home Page / Explanation Tiles</summary>
+
+<img src="" alt="Home" width="180"/>
+<img src="" alt="Tiles" width="180"/>
+
+</details>
+
+<details>
+<summary>Configuration / Start Test / IoT RestAPI </summary>
+
+<img src="" alt="Config" width="180"/>
+<img src="Screenshots/Start Test(APP).png" alt="Start" width="180"/>
+<img src="Screenshots/Pi DataPipe(APP).png" alt="Pi" width="720" height="400"/>
+
+</details>
+
+<details>
+<summary>History / Upload / Retreival Page</summary>
+
+<img src="Screenshots/History Page(APP).png" alt="History" width="180"/>
+<img src="Screenshots/Upload Popup(APP).png" alt="Upload" width="180"/>
+<img src="Screenshots/Results Page(APP).png" alt="Results" width="180"/>
+
+</details>
+
+<details>
+<summary>Settings / Log Out</summary>
+
+<img src="" alt="Settings" width="180"/>
+<img src="" alt="Logout" width="180"/>
 
 
-
+</details>
 

@@ -44,7 +44,7 @@ class LoginView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           const Text('Don\'t have an account? ',
-                              style: TextStyle(fontSize: 18)),
+                              style: TextStyle(fontSize: 16)),
                           InkWell(
                             onTap: () {
                               Navigator.push(
