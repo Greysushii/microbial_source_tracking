@@ -36,7 +36,7 @@ class _HomeListViewState extends State<HomeView> {
         navBarKey: homeNavKey,
       ),
       NavModel(
-        page: ConfigView(title: '',),
+        page: ConfigView(/*title: '',*/),
         navBarKey: configNavKey,
       ),
       NavModel(

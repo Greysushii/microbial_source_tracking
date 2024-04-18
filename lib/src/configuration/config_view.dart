@@ -1,127 +1,110 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
-// class ConfigView extends StatelessWidget {
-//   const ConfigView({super.key});
+// ignore_for_file: prefer_const_constructors
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text("Configuration"),
-//       ),
-//       body: SingleChildScrollView(
-//         child: Column(
-//           children: <Widget>[
-//             StreamBuilder<List<ScanResult>>(
-//               stream: FlutterBluePlus.scanResults, 
-//               initialData: [],
-//               builder: (c, snapshot) => Column(
-//                 children: snapshot.data!
-//                     .map((result) => ListTile(
-//                       title: Text(result.device.platformName == "" ? "No Device Name" : result.device.platformName),
-//                       subtitle: Text(result.device.remoteId.toString()),
-//                       onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context){
-//                         result.device.connect();
-//                         return LightController(device: result.device);
-//                       })),
-//                     ))
-//                     .toList(),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//       floatingActionButton: StreamBuilder<bool>(
-//         stream: FlutterBluePlus.isScanning,
-//         initialData: false,
-//         builder: (c, snapshot) {
-//           if (snapshot.data!) {
-//             return FloatingActionButton(
-//               onPressed: () => FlutterBluePlus.stopScan(),
-//               backgroundColor: Colors.lightBlue.shade700,
-//               child: const Icon(Icons.stop),
-//             );
-//           } 
-//           else {
-//             return FloatingActionButton(
-//               onPressed: () => FlutterBluePlus.startScan(
-//                 timeout: const Duration(seconds: 5),
-//               ),
-//               backgroundColor: Colors.lightBlue.shade700,
-//               child: const Icon(Icons.search),
-//             );
-//           }
-//         },
-//       ),
-//     );
-//   }
-// }
+import 'package:flutter/material.dart';
+import 'package:microbial_source_tracking/src/widgets/bluetooth_connection_controller.dart';
+import 'package:microbial_source_tracking/src/widgets/wifi_connection_controller.dart';
+import '../themes/glwa_theme.dart';
+
+
+/*
+Here is the configuration page for the applications connection to the IoT device running 
+on a raspberry pi. This is the UI portion of it, the page will direct the user to either 
+Wi-Fi or Bluetooth configurations. Here the user will decided whether they are going to
+use one or the other.
+*/
+
+
+
+
 
 class ConfigView extends StatefulWidget {
- ConfigView({Key? key, required this.title}) : super(key: key);
-final String title;
-@override
- _ConfigView createState() => _ConfigView();
+  const ConfigView({super.key});
+
+  @override
+  State<ConfigView> createState() => _Configview();
 }
 
-class _ConfigView extends State<ConfigView> {
-  String _pinState = 'off';
-  void _sendCommand(String pinState) async {
-
-    String url = 'https://1720-174-240-144-251.ngrok-free.app/control'; //enter pyngrok generated url
-    Map<String, String> headers = {'Content-Type': 'application/json'};
-    String body = jsonEncode({'pin_state': pinState});
-
-    try{
-      final response = await http.post(Uri.parse(url), headers: headers,body: body);
-      if (response.statusCode == 200) {
-        setState(() {
-          _pinState = pinState;
-        });
-        print('Command sent successfully');
-      } else {
-        print('Command failed');
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
+class _Configview extends State<ConfigView> {
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: const Text('Configuration'),
+        backgroundColor: Colors.white,
       ),
-      body: Center(
+      body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'GPIO Pin State:',
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 20,
             ),
-            Text(
-              _pinState,
-              style: Theme.of(context).textTheme.headlineLarge,
+            const SizedBox(
+              height: 30,
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(onPressed: () {
-              _sendCommand('on');
-            },
-            child: const Text('Turn On'),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: ((context) => BluetoothConnect())
+                  )
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(25),
+                margin: const EdgeInsets.symmetric(horizontal: 30),
+                decoration: BoxDecoration(
+                    color: glwaTheme.secondaryHeaderColor,
+                    borderRadius: BorderRadius.circular(8.0),
+                    border: const Border(
+                        bottom: BorderSide(color: Colors.black),
+                        top: BorderSide(color: Colors.black),
+                        left: BorderSide(color: Colors.black),
+                        right: BorderSide(color: Colors.black))),
+                child: const Center(
+                  child: Text(
+                    'Bluetooth Connection',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(height: 20,),
-            ElevatedButton(
-              onPressed: () {
-                _sendCommand('off');
-              }, 
-              child: const Text('Turn Off'),
+            const SizedBox(
+              height: 30,
             ),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: ((context) => WifiConnect(title: ' ',))
+                  )
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(25),
+                margin: const EdgeInsets.symmetric(horizontal: 30),
+                decoration: BoxDecoration(
+                    color: glwaTheme.secondaryHeaderColor,
+                    borderRadius: BorderRadius.circular(8.0),
+                    border: const Border(
+                        bottom: BorderSide(color: Colors.black),
+                        top: BorderSide(color: Colors.black),
+                        left: BorderSide(color: Colors.black),
+                        right: BorderSide(color: Colors.black))),
+                child: const Center(
+                  child: Text(
+                    'Wi-Fi Connection',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            )
           ],
-        )
+        ),
       ),
     );
   }
-
 }

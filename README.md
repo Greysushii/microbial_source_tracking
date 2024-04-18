@@ -190,22 +190,30 @@ Department of Computer Science
 <summary>Login / Registration</summary>
 
 <img src="Screenshots/Login Page(APP).png" alt="Login" width="180"/>
-<img src="" alt="Register" width="180"/>
+<img src="Screenshots/Registration Page(APP).png" alt="Register" width="180"/>
 
 </details>
 
 <details>
 <summary>Home Page / Explanation Tiles</summary>
 
-<img src="" alt="Home" width="180"/>
-<img src="" alt="Tiles" width="180"/>
+<img src="Screenshots/Home Page(APP).png" alt="Home" width="180"/>
+<img src="Screenshots/Home Page Tile(APP).png" alt="Tiles" width="180"/>
 
 </details>
 
 <details>
-<summary>Configuration / Start Test / IoT RestAPI </summary>
+<summary>Configuration / Bluetooth Connection / Wi-Fi Connection </summary>
 
-<img src="" alt="Config" width="180"/>
+<img src="Screenshots/Config Page(APP).png" alt="Config" width="180"/>
+<img src="Screenshots/Bluetooth Page(APP).png" alt="BLE" width="180"/>
+<img src="Screenshots/Wifi Page(APP).png" alt="Wifi" width="180"/>
+
+</details>
+
+<details>
+<summary>Start Test / IoT RestAPI </summary>
+
 <img src="Screenshots/Start Test(APP).png" alt="Start" width="180"/>
 <img src="Screenshots/Pi DataPipe(APP).png" alt="Pi" width="720" height="400"/>
 
@@ -221,10 +229,10 @@ Department of Computer Science
 </details>
 
 <details>
-<summary>Settings / Log Out</summary>
+<summary>Settings / Account Data</summary>
 
-<img src="" alt="Settings" width="180"/>
-<img src="" alt="Logout" width="180"/>
+<img src="Screenshots/Settings Page(APP).png" alt="Settings" width="180"/>
+<img src="Screenshots/Account Settings(APP).png" alt="Account" width="180"/>
 
 
 </details>
