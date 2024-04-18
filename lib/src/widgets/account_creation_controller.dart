@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:async';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -318,8 +319,8 @@ class RegisterState extends State<Register> {
                 if (text == null || text.isEmpty) {
                   return "Please enter your email.";
                 }
-                if (!text.contains('@')) {
-                  return "Email address must contain an @.";
+                if (!EmailValidator.validate(userEmail.text.trim())) {
+                  return "Please enter a valid email.";
                 }
                 return null;
               }),
