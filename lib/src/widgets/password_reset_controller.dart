@@ -1,9 +1,9 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:async';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:microbial_source_tracking/src/login/login_view.dart';
 
 /*This file handles changing the user's password by clicking "Forgot password?"
   on the login screen.*/
@@ -44,7 +44,7 @@ class PasswordResetState extends State<PasswordReset> {
         issueTitle = "Password reset email sent";
         issueContent =
             "If ${userEmail.text} exists within our database, a password reset link will appear in your inbox.";
-        textForButton = "Return to login";
+        textForButton = "OK";
       case 7:
         issueTitle = "No email provided";
         issueContent = "Please enter a valid email address";
@@ -62,17 +62,12 @@ class PasswordResetState extends State<PasswordReset> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                if (issue == 6) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            LoginView()), //return the user to the login page
-                  );
-                } else {
-                  Navigator.of(context)
-                      .pop(); //return the user to the forgot password page as they failed to fill in the email field
-                }
+                // if (issue == 6) {
+                //   Navigator.of(context).pop();
+                // } else {
+                //   Navigator.of(context).pop(); //return the user to the forgot password page as they failed to fill in the email field
+                // }
+                Navigator.of(context).pop();
               },
               child: Text(textForButton, style: const TextStyle(fontSize: 20)),
             ),
@@ -113,8 +108,8 @@ class PasswordResetState extends State<PasswordReset> {
                 if (text == null || text.isEmpty) {
                   return "Please enter your email.";
                 }
-                if (!text.contains('@')) {
-                  return "Email address must contain an @.";
+                if (!EmailValidator.validate(userEmail.text.trim())) {
+                  return "Please enter a valid email.";
                 }
                 return null;
               }),

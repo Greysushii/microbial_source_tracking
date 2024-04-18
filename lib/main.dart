@@ -30,16 +30,15 @@ class _MyAppState extends State<MyApp> {
       home: StreamBuilder<BluetoothAdapterState>(
         stream: FlutterBluePlus.adapterState,
         initialData: BluetoothAdapterState.unknown,
-        builder: (context, snapshot){
+        builder: (context, snapshot) {
           final state = snapshot.data;
           if (state == BluetoothAdapterState.on) {
             return const AuthPage();
-          }
-          else {
+          } else {
             return const AuthPage();
           }
         },
-      ), 
+      ),
     );
   }
 }
