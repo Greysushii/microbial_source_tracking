@@ -19,7 +19,7 @@ class _WifiConnect extends State<WifiConnect> {
   String _pinState = 'off';
   void _sendCommand(String pinState) async {
 
-    String url = 'https://46f3-174-240-144-167.ngrok-free.app/control'; //enter pyngrok generated url
+    String url = 'https://02e8-2600-1007-b030-e6f0-bcc9-cbdb-1ad-1299.ngrok-free.app/control'; //enter pyngrok generated url
     Map<String, String> headers = {'Content-Type': 'application/json'};
     String body = jsonEncode({'pin_state': pinState});
 
